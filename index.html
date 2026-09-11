@@ -252,6 +252,15 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 @keyframes scan{0%{top:-5%;opacity:1;}100%{top:105%;opacity:0;}}
 .empty-hint{padding:60px 0;text-align:center;color:var(--paper-dim);font-size:14px;border:1px dashed var(--line-strong);border-radius:8px;}
 
+/* ---------- reels (instagram embeds) ---------- */
+.reels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;margin-top:44px;justify-items:center;}
+.reel-embed-card{width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;}
+.reel-embed-card blockquote.instagram-media{margin:0 auto !important;width:100% !important;background:var(--ink2) !important;border-color:var(--line-strong) !important;}
+.reel-embed-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.reel-embed-cap{font-size:13px;color:var(--paper-dim);line-height:1.5;}
+.reel-embed-link{font-size:11px;color:var(--teal);letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;transition:color .2s;}
+.reel-embed-link:hover{color:var(--orange);}
+
 /* ---------- past projects (grid smaller) ---------- */
 .past-section{background:var(--ink2);}
 .past-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line);margin-top:40px;}
@@ -379,6 +388,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
   .work-grid{grid-template-columns:1fr;}
   .past-grid{grid-template-columns:repeat(2,1fr);}
   .threed-grid{grid-template-columns:repeat(2,1fr);}
+  .reels-grid{grid-template-columns:1fr;}
   nav.links{display:none;}
   .burger{display:flex;}
   section{padding:90px 20px;}
@@ -412,6 +422,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
     <a href="#about">About</a>
     <a href="#skills">Skills</a>
     <a href="#work">Work</a>
+    <a href="#reels">Reels</a>
     <a href="#past">Archive</a>
     <a href="#albums">Album Art</a>
     <a href="#threed">3D</a>
@@ -501,10 +512,19 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
   <div class="work-grid" id="workGrid"></div>
 </section>
 
+<!-- REELS -->
+<section id="reels">
+  <span class="section-count mono">04 / REELS</span>
+  <div class="eyebrow reveal-up">00:00:18:00 — Edited Reels</div>
+  <h2 class="sec-title reveal-up">Instagram Reels</h2>
+  <p class="sec-sub reveal-up">A running feed of reels I've cut, graded, and shipped — press play right here, or open on Instagram.</p>
+  <div class="reels-grid" id="reelsGrid"></div>
+</section>
+
 <!-- PAST PROJECTS -->
 <section class="past-section" id="past">
   <div style="max-width:1360px;margin:0 auto;padding:140px 32px;position:relative;">
-    <span class="section-count mono">04 / ARCHIVE</span>
+    <span class="section-count mono">05 / ARCHIVE</span>
     <div class="eyebrow reveal-up">00:00:22:00 — Past Projects</div>
     <h2 class="sec-title reveal-up">The Archive</h2>
     <div class="past-grid" id="pastGrid"></div>
@@ -513,7 +533,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
 <!-- ALBUM ART -->
 <section id="albums">
-  <span class="section-count mono">05 / ALBUM ART</span>
+  <span class="section-count mono">06 / ALBUM ART</span>
   <div class="eyebrow reveal-up">00:00:27:00 — Cover Art</div>
   <h2 class="sec-title reveal-up">Album Arts</h2>
   <p class="sec-sub reveal-up">Client releases plus personal redesign practice.</p>
@@ -524,7 +544,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
 <!-- 3D -->
 <section id="threed">
-  <span class="section-count mono">06 / 3D</span>
+  <span class="section-count mono">07 / 3D</span>
   <div class="eyebrow reveal-up">00:00:33:00 — Extra Dimension</div>
   <h2 class="sec-title reveal-up">3D & Virtual Production</h2>
   <div class="threed-grid" id="threedGrid"></div>
@@ -606,14 +626,20 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
           <div class="form-field"><label>Section</label>
             <select id="fSection">
               <option value="featured">Featured Work</option>
+              <option value="reels">Reels (Instagram)</option>
               <option value="past">Past Projects / Archive</option>
               <option value="album">Album Art</option>
               <option value="threed">3D & Virtual Production</option>
             </select>
           </div>
+          <div class="form-field full" id="fIgUrlField" style="display:none;">
+            <label>Instagram Reel/Post Link</label>
+            <input type="text" id="fIgUrl" placeholder="https://www.instagram.com/reel/XXXXXXXXXXX/">
+            <p style="color:var(--paper-faint);font-size:11px;margin-top:6px;">Paste the link from the Share button on the reel or post. Only public posts embed correctly.</p>
+          </div>
           <div class="form-field"><label>Roles / Tags (comma separated)</label><input type="text" id="fTags" placeholder="Editing, VFX, Motion Graphics"></div>
           <div class="form-field full"><label>Description</label><textarea id="fDesc" placeholder="What this project was, who it's for, what you did..."></textarea></div>
-          <div class="form-field full">
+          <div class="form-field full" id="fCoverField">
             <label>Cover Image</label>
             <label class="upload-box">
               <input type="file" accept="image/*" id="fCoverInput">
@@ -621,7 +647,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
             </label>
             <img id="uploadPreview" class="upload-preview" style="display:none;">
           </div>
-          <div class="form-field full">
+          <div class="form-field full" id="fLinksField">
             <label>Links</label>
             <div id="linkRows"></div>
             <button class="btn btn-outline" style="margin-top:4px;padding:8px 16px;font-size:11px;" id="addLinkRowBtn">+ Add Link</button>
@@ -994,6 +1020,37 @@ function renderReel(){
   document.getElementById('reelPoster').src = SETTINGS.reelPoster || IMG.hero_kheefa;
 }
 
+/* ---- Instagram reels embed ---- */
+function ensureInstagramEmbedScript(cb){
+  if(window.instgrm && window.instgrm.Embeds){ cb(); return; }
+  const existing = document.getElementById('igEmbedScript');
+  if(existing){ existing.addEventListener('load', cb); if(window.instgrm) cb(); return; }
+  const s = document.createElement('script');
+  s.id = 'igEmbedScript';
+  s.async = true;
+  s.src = 'https://www.instagram.com/embed.js';
+  s.onload = cb;
+  document.body.appendChild(s);
+}
+
+function renderReels(){
+  const el = document.getElementById('reelsGrid');
+  const list = PROJECTS.filter(p=>p.section==='reels' && p.igUrl);
+  if(!list.length){
+    el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">No reels added yet. Open the admin panel and paste your first Instagram reel link.</div>`;
+    return;
+  }
+  el.innerHTML = list.map(p=>`
+    <div class="reel-embed-card">
+      <blockquote class="instagram-media" data-instgrm-permalink="${escapeHtml(p.igUrl)}" data-instgrm-version="14"></blockquote>
+      <div class="reel-embed-foot">
+        ${p.title? `<span class="reel-embed-cap">${escapeHtml(p.title)}</span>` : '<span></span>'}
+        <a class="reel-embed-link mono" href="${escapeHtml(p.igUrl)}" target="_blank" rel="noopener">View on Instagram ↗</a>
+      </div>
+    </div>`).join('');
+  ensureInstagramEmbedScript(()=>{ if(window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); });
+}
+
 function renderHeroText(){
   document.getElementById('logoText').textContent = SETTINGS.logoText || 'RS';
   document.getElementById('heroLine1').textContent = SETTINGS.heroLine1 || 'RICHIN';
@@ -1008,6 +1065,7 @@ function renderAll(){
   renderSoftware();
   renderFilters();
   renderWork();
+  renderReels();
   renderPast();
   renderAlbums();
   renderThreeD();
@@ -1079,7 +1137,7 @@ window.addEventListener('scroll', onScroll, {passive:true});
 
 function buildScrubberMarks(){
   const track = document.getElementById('scrubberMarks');
-  const sections = ['hero','about','skills','work','past','albums','threed','contact'];
+  const sections = ['hero','about','skills','work','reels','past','albums','threed','contact'];
   const docHeight = document.documentElement.scrollHeight - window.innerHeight;
   track.innerHTML = '';
   sections.forEach(id=>{
@@ -1166,7 +1224,7 @@ document.querySelectorAll('.admin-tab').forEach(t=>t.addEventListener('click', (
 
 function renderAdminList(){
   const el = document.getElementById('adminList');
-  const secLabel = {featured:'Featured Work', past:'Archive', album:'Album Art', threed:'3D'};
+  const secLabel = {featured:'Featured Work', reels:'Reels', past:'Archive', album:'Album Art', threed:'3D'};
   el.innerHTML = PROJECTS.map(p=>`
     <div class="admin-list-item">
       <img src="${p.cover||''}" onerror="this.style.opacity=0">
@@ -1190,11 +1248,20 @@ async function deleteProject(id){
 }
 
 let uploadedCoverData = '';
+function updateAddFormVisibility(){
+  const isReel = document.getElementById('fSection').value === 'reels';
+  document.getElementById('fIgUrlField').style.display = isReel ? 'block' : 'none';
+  document.getElementById('fCoverField').style.display = isReel ? 'none' : 'block';
+  document.getElementById('fLinksField').style.display = isReel ? 'none' : 'block';
+}
+document.getElementById('fSection').addEventListener('change', updateAddFormVisibility);
+
 function clearForm(){
   editingId = null;
   document.getElementById('fTitle').value='';
   document.getElementById('fYear').value='';
   document.getElementById('fSection').value='featured';
+  document.getElementById('fIgUrl').value='';
   document.getElementById('fTags').value='';
   document.getElementById('fDesc').value='';
   document.getElementById('uploadPreview').style.display='none';
@@ -1202,6 +1269,7 @@ function clearForm(){
   uploadedCoverData='';
   document.getElementById('linkRows').innerHTML='';
   addLinkRow();
+  updateAddFormVisibility();
 }
 function addLinkRow(label, url){
   const row = document.createElement('div');
@@ -1237,6 +1305,8 @@ function editProject(id){
   document.getElementById('fTitle').value = p.title;
   document.getElementById('fYear').value = p.year||'';
   document.getElementById('fSection').value = p.section;
+  document.getElementById('fIgUrl').value = p.igUrl||'';
+  updateAddFormVisibility();
   document.getElementById('fTags').value = tagsToArr(p.tags).join(', ');
   document.getElementById('fDesc').value = p.desc||'';
   uploadedCoverData = p.cover||'';
@@ -1249,6 +1319,9 @@ function editProject(id){
 document.getElementById('saveProjectBtn').addEventListener('click', async ()=>{
   const title = document.getElementById('fTitle').value.trim();
   if(!title){ showToast('Give the project a title first'); return; }
+  if(document.getElementById('fSection').value === 'reels' && !document.getElementById('fIgUrl').value.trim()){
+    showToast('Paste the Instagram reel link first'); return;
+  }
   const links = Array.from(document.querySelectorAll('#linkRows .link-row')).map(r=>({
     label: r.querySelector('.lLabel').value.trim(),
     url: r.querySelector('.lUrl').value.trim()
@@ -1260,6 +1333,7 @@ document.getElementById('saveProjectBtn').addEventListener('click', async ()=>{
     year: document.getElementById('fYear').value.trim(),
     tags: document.getElementById('fTags').value.split(',').map(s=>s.trim()).filter(Boolean),
     desc: document.getElementById('fDesc').value.trim(),
+    igUrl: document.getElementById('fIgUrl').value.trim(),
     cover: uploadedCoverData,
     gallery: uploadedCoverData ? [uploadedCoverData] : [],
     links
@@ -1468,6 +1542,20 @@ async function exportPortfolioPDF(){
       x += thumb + gap;
     });
     y += thumb + 30;
+  }
+
+  // Reels (Instagram)
+  const reels = PROJECTS.filter(p=>p.section==='reels' && p.igUrl);
+  if(reels.length){
+    sectionHeading('Instagram Reels');
+    doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    reels.forEach(p=>{
+      y = pdfEnsureSpace(doc, y, 14, pageH, margin);
+      doc.setTextColor(...orange);
+      doc.textWithLink((p.title? p.title+'  —  ':'') + p.igUrl, margin, y, {url:p.igUrl});
+      y += 13;
+    });
+    y += 10;
   }
 
   // Footer on every page
