@@ -791,7 +791,10 @@ const SUPABASE_URL = "https://ooyukxkzyscctgddqcfh.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9veXVreGt6eXNjY3RnZGRxY2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2ODg2MDQsImV4cCI6MjEwMjI2NDYwNH0.6DxpNazw1wWUOnn1DdlRNJPizkG5JvfRF5yFiP0DuEw";
 const REMOTE = !!(SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY);
 const usingSupabase = () => REMOTE;
-const REST = SUPABASE_URL + '/rest/v1';
+/* If your ISP blocks supabase.co (some Indian ISPs do), put your Cloudflare Worker URL here,
+   e.g. "https://supabase-proxy.YOURNAME.workers.dev" — see the setup notes. Leave "" to connect directly. */
+const API_BASE = "";
+const REST = (API_BASE || SUPABASE_URL).replace(/\/+$/, '') + '/rest/v1';
 const hasClaudeStorage = () => (typeof window.storage !== 'undefined');
 const hasStorage = hasClaudeStorage;
 
@@ -1151,7 +1154,8 @@ async function saveProjects(list){
     return true;
   }catch(e){
     console.error('Save failed', e);
-    showToast('Could not save to the database — nothing was changed. (' + String(e.message).slice(0, 60) + ')');
+    const netDown = /Failed to fetch|NetworkError|aborted|Load failed/i.test(String(e.message));
+    showToast(netDown ? 'Can’t reach the database (network or ISP block) — nothing was changed.' : 'Could not save to the database — nothing was changed. (' + String(e.message).slice(0, 60) + ')');
     return false;
   }
 }
@@ -1533,7 +1537,7 @@ function refreshBackendStatus(){
       statusEl.textContent = '● Connected to Supabase — changes save permanently. Last synced ' + new Date(LAST_SYNC).toLocaleTimeString() + '.';
     } else if(SYNC_STATUS === 'error'){
       statusEl.style.borderColor = 'var(--orange)'; statusEl.style.color = 'var(--orange)';
-      statusEl.textContent = '● Can’t reach Supabase right now — showing your last saved copy. New changes will NOT be saved until it reconnects (retrying automatically).';
+      statusEl.textContent = '● Can’t reach Supabase right now — showing your last saved copy. New changes will NOT be saved until it reconnects (retrying automatically). If this keeps happening on your normal Wi-Fi/mobile data, your ISP may be blocking supabase.co — set up the Cloudflare proxy (API_BASE in the script).';
     } else {
       statusEl.style.borderColor = 'var(--paper-faint)'; statusEl.style.color = 'var(--paper-faint)';
       statusEl.textContent = '● Connecting to Supabase…';
