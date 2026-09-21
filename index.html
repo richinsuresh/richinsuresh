@@ -251,20 +251,29 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 @keyframes scan{0%{top:-5%;opacity:1;}100%{top:105%;opacity:0;}}
 .empty-hint{padding:60px 0;text-align:center;color:var(--paper-dim);font-size:14px;border:1px dashed var(--line-strong);border-radius:8px;}
 
-/* ---------- reels (instagram embeds) ---------- */
-.reels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;margin-top:44px;justify-items:center;}
-.reel-embed-card{width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;}
-.reel-embed-frame{position:relative;width:100%;aspect-ratio:1/1.9;background:var(--ink2);border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;}
+/* ---------- reels (instagram embeds) — dark cards ---------- */
+.reels-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+.reels-head .btn{margin-right:44px;}
+@media (max-width:860px){.reels-head .btn{margin-right:0;}}
+.reels-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:20px;margin-top:40px;align-items:start;}
+.reel-card{background:var(--ink2);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;transition:border-color .25s ease;}
+.reel-card:hover{border-color:var(--line-strong);}
+.reel-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 4px 0;}
+.reel-num{font-size:11px;letter-spacing:0.08em;color:var(--paper-faint);}
+.reel-open{font-size:11px;letter-spacing:0.04em;color:var(--paper-dim);transition:color .2s;}
+.reel-open:hover{color:var(--teal);}
+.reel-embed-frame{position:relative;width:100%;aspect-ratio:9/17;border-radius:9px;overflow:hidden;background:linear-gradient(110deg,var(--ink) 30%,var(--ink3) 50%,var(--ink) 70%);background-size:220% 100%;animation:reelShimmer 1.6s linear infinite;}
+.reel-embed-frame.loaded,.reel-embed-frame.failed{animation:none;background:var(--ink);}
+@keyframes reelShimmer{from{background-position:120% 0;}to{background-position:-120% 0;}}
 .reel-embed-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-.reel-embed-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--paper-dim);}
+.reel-embed-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--paper-faint);}
+.ph-play{width:46px;height:46px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;}
+.ph-play::after{content:'';border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid var(--paper-faint);margin-left:3px;}
 .reel-embed-ph .ph-fail{display:none;color:var(--teal);}
 .reel-embed-frame.failed:not(.loaded) .ph-load{display:none;}
 .reel-embed-frame.failed:not(.loaded) .ph-fail{display:inline;}
 .reel-embed-frame.loaded .reel-embed-ph{display:none;}
-.reel-embed-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.reel-embed-cap{font-size:13px;color:var(--paper-dim);line-height:1.5;}
-.reel-embed-link{font-size:11px;color:var(--teal);letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;transition:color .2s;}
-.reel-embed-link:hover{color:var(--orange);}
+.reel-cap{font-size:13px;line-height:1.5;color:var(--paper-dim);padding:0 4px 2px;}
 .reels-more{display:flex;justify-content:center;margin-top:44px;}
 
 /* ---------- past projects (grid smaller) ---------- */
@@ -528,8 +537,11 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 <section id="reels">
   <span class="section-count mono">04 / REELS</span>
   <div class="eyebrow reveal-up">00:00:18:00 — Edited Reels</div>
-  <h2 class="sec-title reveal-up">Instagram Reels</h2>
-  <p class="sec-sub reveal-up">A running feed of reels I've cut, graded, and shipped — press play right here, or open on Instagram.</p>
+  <div class="reels-head reveal-up">
+    <h2 class="sec-title">Instagram Reels</h2>
+    <a class="btn btn-outline" href="https://www.instagram.com/richinsuresh/" target="_blank" rel="noopener">Follow on Instagram ↗</a>
+  </div>
+  <p class="sec-sub reveal-up">Reels I've cut, graded and shipped — play them right here.</p>
   <div class="reels-grid" id="reelsGrid"></div>
   <div class="reels-more" id="reelsMore"></div>
 </section>
@@ -1319,22 +1331,24 @@ window.addEventListener('message', (e) => {
   });
 });
 
-function reelCardHTML(p){
+function reelCardHTML(p, i){
   const ig = igParse(p.igUrl);
   const url = ig ? ig.url : (safeUrl(p.igUrl) || '#');
   return `
-    <div class="reel-embed-card" data-id="${escapeHtml(p.id)}" data-key="${escapeHtml(p.id + '|' + p.igUrl + '|' + p.title)}">
+    <article class="reel-card" data-id="${escapeHtml(p.id)}" data-key="${escapeHtml(p.id + '|' + p.igUrl + '|' + p.title)}">
+      <div class="reel-card-top">
+        <span class="reel-num mono">${String(i + 1).padStart(2, '0')}</span>
+        <a class="reel-open mono" href="${escapeHtml(url)}" target="_blank" rel="noopener">Open on Instagram ↗</a>
+      </div>
       <div class="reel-embed-frame" ${ig ? `data-embed="${escapeHtml(ig.embed)}"` : ''}>
         <div class="reel-embed-ph">
+          <span class="ph-play"></span>
           <span class="ph-load mono">Loading reel…</span>
           <a class="ph-fail mono" href="${escapeHtml(url)}" target="_blank" rel="noopener">Preview unavailable — open on Instagram ↗</a>
         </div>
       </div>
-      <div class="reel-embed-foot">
-        ${p.title ? `<span class="reel-embed-cap">${escapeHtml(p.title)}</span>` : '<span></span>'}
-        <a class="reel-embed-link mono" href="${escapeHtml(url)}" target="_blank" rel="noopener">View on Instagram ↗</a>
-      </div>
-    </div>`;
+      ${p.title ? `<p class="reel-cap">${escapeHtml(p.title)}</p>` : ''}
+    </article>`;
 }
 
 function renderReels(){
@@ -1355,12 +1369,12 @@ function renderReels(){
 
   const shown = all.slice(0, reelsVisible);
   const want = shown.map(p => p.id + '|' + p.igUrl + '|' + p.title);
-  const cur = Array.from(el.querySelectorAll('.reel-embed-card')).map(c => c.dataset.key);
+  const cur = Array.from(el.querySelectorAll('.reel-card')).map(c => c.dataset.key);
   const prefixOk = cur.length > 0 && cur.length <= want.length && cur.every((k, i) => k === want[i]);
   if(prefixOk){
-    if(cur.length < want.length) el.insertAdjacentHTML('beforeend', shown.slice(cur.length).map(reelCardHTML).join(''));
+    if(cur.length < want.length) el.insertAdjacentHTML('beforeend', shown.slice(cur.length).map((p, i) => reelCardHTML(p, cur.length + i)).join(''));
   } else {
-    el.innerHTML = shown.map(reelCardHTML).join('');
+    el.innerHTML = shown.map((p, i) => reelCardHTML(p, i)).join('');
   }
   el.querySelectorAll('.reel-embed-frame[data-embed]:not([data-obs])').forEach(fr => {
     fr.dataset.obs = '1';
