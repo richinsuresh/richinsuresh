@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Richin Suresh — Digital Creator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#0B0B0D;
@@ -46,7 +45,7 @@ img{display:block;max-width:100%;}
 
 /* ---------- grain overlay ---------- */
 .grain{
-  position:fixed;inset:0;pointer-events:none;z-index:9990;opacity:0.05;mix-blend-mode:overlay;
+  position:fixed;inset:0;pointer-events:none;z-index:9990;opacity:0.035;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -74,7 +73,7 @@ img{display:block;max-width:100%;}
 /* ---------- timeline scrubber ---------- */
 .scrubber{
   position:fixed;top:0;left:0;right:0;height:34px;z-index:500;
-  background:rgba(11,11,13,0.86);backdrop-filter:blur(6px);
+  background:rgba(11,11,13,0.96);
   border-bottom:1px solid var(--line);
   display:flex;align-items:center;padding:0 16px;gap:10px;
   transform:translateY(0);transition:transform .4s ease;
@@ -83,11 +82,11 @@ img{display:block;max-width:100%;}
 .scrubber-track{
   position:relative;flex:1;height:2px;background:var(--line-strong);
 }
-.scrubber-fill{position:absolute;left:0;top:0;height:100%;background:var(--orange);width:0%;}
+.scrubber-fill{position:absolute;left:0;top:0;height:100%;background:var(--orange);width:100%;transform:scaleX(0);transform-origin:left;will-change:transform;}
 .scrubber-play{
   position:absolute;top:50%;width:0;height:0;
   border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--orange);
-  transform:translate(-4px,-50%);left:0%;filter:drop-shadow(0 0 4px rgba(255,107,53,.7));
+  transform:translate(-4px,-50%);left:0;will-change:transform;
 }
 .scrubber-marks{position:absolute;inset:0;}
 .scrubber-mark{
@@ -102,7 +101,7 @@ header{
   display:flex;align-items:center;justify-content:space-between;
   padding:18px 32px;transition:background .3s ease, padding .3s ease, top .4s ease;
 }
-header.scrolled{background:rgba(11,11,13,0.82);backdrop-filter:blur(10px);padding:12px 32px;border-bottom:1px solid var(--line);}
+header.scrolled{background:rgba(11,11,13,0.95);padding:12px 32px;border-bottom:1px solid var(--line);}
 .logo{font-family:'Anton',sans-serif;font-size:20px;letter-spacing:0.04em;display:flex;align-items:center;gap:8px;}
 .logo .dot{width:7px;height:7px;background:var(--orange);border-radius:50%;}
 nav.links{display:flex;gap:28px;font-size:13px;letter-spacing:0.03em;text-transform:uppercase;}
@@ -171,8 +170,8 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 }
 .reel-play-btn{
   width:76px;height:76px;border-radius:50%;border:1px solid rgba(244,240,230,0.5);
-  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);
-  transition:all .3s ease;background:rgba(11,11,13,0.3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .3s ease;background:rgba(11,11,13,0.45);
 }
 .reel-play-btn::after{content:'';width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:16px solid var(--paper);margin-left:4px;}
 .reel-frame:hover .reel-play-btn{background:var(--orange);border-color:var(--orange);transform:scale(1.08);}
@@ -255,11 +254,18 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 /* ---------- reels (instagram embeds) ---------- */
 .reels-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;margin-top:44px;justify-items:center;}
 .reel-embed-card{width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;}
-.reel-embed-card blockquote.instagram-media{margin:0 auto !important;width:100% !important;background:var(--ink2) !important;border-color:var(--line-strong) !important;}
+.reel-embed-frame{position:relative;width:100%;aspect-ratio:1/1.9;background:var(--ink2);border:1px solid var(--line-strong);border-radius:6px;overflow:hidden;}
+.reel-embed-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.reel-embed-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--paper-dim);}
+.reel-embed-ph .ph-fail{display:none;color:var(--teal);}
+.reel-embed-frame.failed:not(.loaded) .ph-load{display:none;}
+.reel-embed-frame.failed:not(.loaded) .ph-fail{display:inline;}
+.reel-embed-frame.loaded .reel-embed-ph{display:none;}
 .reel-embed-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 .reel-embed-cap{font-size:13px;color:var(--paper-dim);line-height:1.5;}
 .reel-embed-link{font-size:11px;color:var(--teal);letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;transition:color .2s;}
 .reel-embed-link:hover{color:var(--orange);}
+.reels-more{display:flex;justify-content:center;margin-top:44px;}
 
 /* ---------- past projects (grid smaller) ---------- */
 .past-section{background:var(--ink2);}
@@ -300,11 +306,11 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
 /* ---------- modal (project detail) ---------- */
 .modal-backdrop{
-  position:fixed;inset:0;background:rgba(6,6,7,0.9);backdrop-filter:blur(6px);z-index:800;
+  position:fixed;inset:0;background:rgba(6,6,7,0.95);z-index:800;
   display:flex;align-items:flex-start;justify-content:center;padding:60px 20px;overflow-y:auto;
-  opacity:0;pointer-events:none;transition:opacity .3s ease;
+  opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s ease, visibility 0s linear .3s;
 }
-.modal-backdrop.show{opacity:1;pointer-events:auto;}
+.modal-backdrop.show{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .3s ease, visibility 0s linear 0s;}
 .modal-box{
   background:var(--ink2);border:1px solid var(--line-strong);max-width:920px;width:100%;border-radius:8px;overflow:hidden;
   transform:translateY(30px);transition:transform .35s cubic-bezier(.2,.7,.2,1);
@@ -325,8 +331,8 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 .modal-links{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
 
 /* ---------- admin ---------- */
-.admin-backdrop{position:fixed;inset:0;background:rgba(6,6,7,0.94);backdrop-filter:blur(6px);z-index:900;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;padding:20px;}
-.admin-backdrop.show{opacity:1;pointer-events:auto;}
+.admin-backdrop{position:fixed;inset:0;background:rgba(6,6,7,0.96);z-index:900;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;visibility:hidden;transition:opacity .3s, visibility 0s linear .3s;padding:20px;}
+.admin-backdrop.show{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .3s, visibility 0s linear 0s;}
 .admin-login{background:var(--ink2);border:1px solid var(--line-strong);padding:44px;width:100%;max-width:360px;border-radius:8px;text-align:center;}
 .admin-login .eyebrow{justify-content:center;}
 .admin-login input{
@@ -352,6 +358,11 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 .admin-list-item .info b{display:block;font-size:15px;}
 .admin-list-item .info span{font-size:12px;color:var(--paper-dim);}
 .admin-list-actions{display:flex;gap:8px;}
+.admin-list-item .thumb-ph{width:64px;height:64px;border-radius:4px;flex-shrink:0;background:var(--ink3);display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:16px;}
+.admin-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.admin-toolbar select{background:var(--ink);border:1px solid var(--line-strong);color:var(--paper);padding:8px 12px;border-radius:5px;font-family:inherit;font-size:12px;}
+.admin-toolbar .count{font-size:12px;color:var(--paper-dim);margin-left:auto;}
+.bulk-box{min-height:200px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7;white-space:pre;overflow:auto;}
 .icon-btn{width:34px;height:34px;border:1px solid var(--line-strong);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--paper-dim);}
 .icon-btn:hover{border-color:var(--orange);color:var(--orange);}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
@@ -384,6 +395,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 .section-count{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--paper-faint);position:absolute;top:140px;right:32px;writing-mode:vertical-rl;}
 
 @media (max-width:860px){
+  .grain{display:none;}
   .about-grid{grid-template-columns:1fr;}
   .work-grid{grid-template-columns:1fr;}
   .past-grid{grid-template-columns:repeat(2,1fr);}
@@ -519,6 +531,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
   <h2 class="sec-title reveal-up">Instagram Reels</h2>
   <p class="sec-sub reveal-up">A running feed of reels I've cut, graded, and shipped — press play right here, or open on Instagram.</p>
   <div class="reels-grid" id="reelsGrid"></div>
+  <div class="reels-more" id="reelsMore"></div>
 </section>
 
 <!-- PAST PROJECTS -->
@@ -615,30 +628,48 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
     <div class="admin-content">
 
       <div id="tabProjects">
-        <p style="color:var(--paper-dim);font-size:13px;margin-bottom:16px;">All sections. Click ✎ to edit, 🗑 to remove.</p>
+        <div class="admin-toolbar">
+          <select id="adminFilter">
+            <option value="all">All sections</option>
+            <option value="reels">Reels</option>
+            <option value="featured">Featured Work</option>
+            <option value="past">Archive</option>
+            <option value="album">Album Art</option>
+            <option value="threed">3D</option>
+          </select>
+          <button class="btn btn-outline" id="adminRefreshBtn" style="padding:8px 14px;font-size:11px;">↻ Refresh</button>
+          <span class="count mono" id="adminCount"></span>
+        </div>
         <div id="adminList"></div>
       </div>
 
       <div id="tabAdd" style="display:none;">
         <div class="form-grid">
-          <div class="form-field"><label>Title</label><input type="text" id="fTitle" placeholder="Project title"></div>
-          <div class="form-field"><label>Year</label><input type="text" id="fYear" placeholder="2026"></div>
           <div class="form-field"><label>Section</label>
             <select id="fSection">
               <option value="featured">Featured Work</option>
               <option value="reels">Reels (Instagram)</option>
               <option value="past">Past Projects / Archive</option>
               <option value="album">Album Art</option>
-              <option value="threed">3D & Virtual Production</option>
+              <option value="threed">3D &amp; Virtual Production</option>
             </select>
+          </div>
+          <div class="form-field" id="fYearField"><label>Year</label><input type="text" id="fYear" placeholder="2026"></div>
+
+          <div class="form-field full" id="fIgBulkField" style="display:none;">
+            <label>Instagram reel links — paste as many as you want</label>
+            <textarea id="fIgBulk" class="bulk-box" spellcheck="false" autocomplete="off" placeholder="https://www.instagram.com/reel/AAAAAAAAAAA/&#10;https://www.instagram.com/reel/BBBBBBBBBBB/?igsh=xyz&#10;https://www.instagram.com/reel/CCCCCCCCCCC/&#10;..."></textarea>
+            <p id="fIgBulkInfo" style="color:var(--paper-dim);font-size:12px;margin-top:6px;min-height:16px;">Paste links — one per line, or all together. No titles needed.</p>
+            <p style="color:var(--paper-faint);font-size:11px;margin-top:2px;">Extra bits like ?igsh=… are stripped automatically. Only public reels embed. Duplicates are skipped.</p>
           </div>
           <div class="form-field full" id="fIgUrlField" style="display:none;">
             <label>Instagram Reel/Post Link</label>
             <input type="text" id="fIgUrl" placeholder="https://www.instagram.com/reel/XXXXXXXXXXX/">
-            <p style="color:var(--paper-faint);font-size:11px;margin-top:6px;">Paste the link from the Share button on the reel or post. Only public posts embed correctly.</p>
           </div>
-          <div class="form-field"><label>Roles / Tags (comma separated)</label><input type="text" id="fTags" placeholder="Editing, VFX, Motion Graphics"></div>
-          <div class="form-field full"><label>Description</label><textarea id="fDesc" placeholder="What this project was, who it's for, what you did..."></textarea></div>
+
+          <div class="form-field" id="fTitleField"><label id="fTitleLabel">Title</label><input type="text" id="fTitle" placeholder="Project title"></div>
+          <div class="form-field" id="fTagsField"><label>Roles / Tags (comma separated)</label><input type="text" id="fTags" placeholder="Editing, VFX, Motion Graphics"></div>
+          <div class="form-field full" id="fDescField"><label>Description</label><textarea id="fDesc" placeholder="What this project was, who it's for, what you did..."></textarea></div>
           <div class="form-field full" id="fCoverField">
             <label>Cover Image</label>
             <label class="upload-box">
@@ -753,54 +784,72 @@ const IMG = {
 };
 
 </script>
-
 <script>
 /* ============ BACKEND CONFIG ============ */
-/* Paste your Supabase project values here before you publish this file.
-   Find them in your Supabase project: Settings -> API.
-   Run the SQL setup (provided separately) first, then fill these in. */
+/* Supabase is talked to directly over its REST API (no supabase-js download needed). */
 const SUPABASE_URL = "https://ooyukxkzyscctgddqcfh.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9veXVreGt6eXNjY3RnZGRxY2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2ODg2MDQsImV4cCI6MjEwMjI2NDYwNH0.6DxpNazw1wWUOnn1DdlRNJPizkG5JvfRF5yFiP0DuEw";
-
-let sb = null;
-if(SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL" && window.supabase){
-  try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
-  catch(e){ console.error('Supabase init failed', e); }
-}
-const usingSupabase = () => !!sb;
+const REMOTE = !!(SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY);
+const usingSupabase = () => REMOTE;
+const REST = SUPABASE_URL + '/rest/v1';
 const hasClaudeStorage = () => (typeof window.storage !== 'undefined');
+const hasStorage = hasClaudeStorage;
 
-/* ---- tier 1: Supabase (works once configured, on any host including GitHub Pages) ---- */
-async function sbGetProjects(){
-  const {data, error} = await sb.from('projects').select('data');
-  if(error){ console.error(error); return null; }
-  return data.map(r=>r.data);
+const $ = (id) => document.getElementById(id);
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+function escapeHtml(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-async function sbUpsertProject(project){
-  const {error} = await sb.from('projects').upsert({id:project.id, data:project});
-  if(error) console.error(error);
+/* only allow http(s)/mailto links; bare domains get https:// */
+function safeUrl(u){
+  u = String(u || '').trim();
+  if(!u) return '';
+  if(/^[a-z][a-z0-9+.-]*:/i.test(u)) return /^(https?:|mailto:)/i.test(u) ? u : '';
+  return 'https://' + u.replace(/^\/+/, '');
 }
-async function sbDeleteProject(id){
-  const {error} = await sb.from('projects').delete().eq('id', id);
-  if(error) console.error(error);
+
+/* ---- REST helper with timeout ---- */
+async function sbReq(path, opts = {}){
+  const { method = 'GET', body, prefer, timeout = 15000 } = opts;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeout);
+  try{
+    const headers = { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY };
+    if(body !== undefined) headers['Content-Type'] = 'application/json';
+    if(prefer) headers['Prefer'] = prefer;
+    const res = await fetch(REST + path, { method, headers, signal: ctrl.signal, body: body !== undefined ? JSON.stringify(body) : undefined });
+    if(!res.ok){
+      let msg = ''; try{ msg = (await res.text()).slice(0, 200); }catch(e){}
+      throw new Error('HTTP ' + res.status + ' ' + msg);
+    }
+    const txt = await res.text();
+    return txt ? JSON.parse(txt) : null;
+  } finally { clearTimeout(timer); }
 }
-async function sbGetSettings(){
-  const {data, error} = await sb.from('settings').select('data').eq('id','main').maybeSingle();
-  if(error || !data) return null;
-  return data.data;
+async function withRetry(fn, tries = 3, base = 700){
+  let err;
+  for(let i = 0; i < tries; i++){
+    try{ return await fn(); }catch(e){ err = e; if(i < tries - 1) await sleep(base * Math.pow(2, i)); }
+  }
+  throw err;
 }
-async function sbSetSettings(settings){
-  const {error} = await sb.from('settings').upsert({id:'main', data:settings});
-  if(error) console.error(error);
+const UPSERT = 'resolution=merge-duplicates,return=minimal';
+async function sbUpsertRows(table, rows, chunk = 50){
+  for(let i = 0; i < rows.length; i += chunk){
+    await sbReq('/' + table + '?on_conflict=id', { method: 'POST', body: rows.slice(i, i + chunk), prefer: UPSERT, timeout: 40000 });
+  }
+}
+async function sbDeleteIds(ids){
+  for(let i = 0; i < ids.length; i += 50){
+    const part = ids.slice(i, i + 50).map(encodeURIComponent).join(',');
+    await sbReq('/projects?id=in.(' + part + ')', { method: 'DELETE', prefer: 'return=minimal', timeout: 30000 });
+  }
 }
 
 /* ---- tier 2: Claude artifact shared storage (works only inside Claude.ai) ---- */
-const hasStorage = hasClaudeStorage;
 async function storeGet(key, shared){
-  try{
-    const r = await window.storage.get(key, shared);
-    return r ? JSON.parse(r.value) : null;
-  }catch(e){ return null; }
+  try{ const r = await window.storage.get(key, shared); return r ? JSON.parse(r.value) : null; }catch(e){ return null; }
 }
 async function storeSet(key, value, shared){
   try{ await window.storage.set(key, JSON.stringify(value), shared); return true; }
@@ -896,25 +945,240 @@ function defaultSettings(){
   };
 }
 
+
+
 /* ============ STATE ============ */
 let PROJECTS = [];
 let SETTINGS = defaultSettings();
 let editingId = null;
 let currentFilter = "all";
+let REELS_STATE = 'ready';        /* 'loading' | 'ready' | 'error' */
+let HEAVY_READY = !REMOTE;        /* covers from the database have been loaded */
+let SETTINGS_SYNCED = !REMOTE;    /* settings confirmed from the database */
+let SETTINGS_KNOWN = true;        /* we at least have a cached copy (for PIN check) */
+let SYNC_STATUS = 'pending';      /* 'pending' | 'ok' | 'error' */
+let LAST_SYNC = 0;
+let reelsVisible = 6;
+const REELS_PAGE = 6;
+const GALLERY_LOADED = new Set();
+
+const SEED_BY_ID = {}; const SEED_INDEX = {};
+seedProjects().forEach((p, i) => { SEED_BY_ID[p.id] = p; SEED_INDEX[p.id] = i; });
+
+/* ============ HELPERS ============ */
+function tagsToArr(t){ return Array.isArray(t) ? t : String(t||'').split(',').map(s=>s.trim()).filter(Boolean); }
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i); h|=0;} return h; }
+function idTime(id){ const m = String(id).match(/\d{10,}/); return m ? Number(m[0]) : 0; }
+
+/* stable ordering: seed projects keep their original order, new ones follow by creation time */
+function orderKey(p){
+  if(p.id in SEED_INDEX) return SEED_INDEX[p.id];
+  return 1000 + (p.addedAt || idTime(p.id) || 0) / 1e10;
+}
+function sortProjects(){ PROJECTS.sort((a,b) => orderKey(a) - orderKey(b)); }
+function reelTime(p){ return p.addedAt || idTime(p.id) || 0; }
+function reelList(){
+  return PROJECTS.filter(p => p.section === 'reels' && p.igUrl).sort((a,b) => reelTime(b) - reelTime(a));
+}
+
+/* ---- Instagram link parsing ---- */
+const IG_SRC = '(?:https?:\\/\\/)?(?:www\\.|m\\.)?instagram\\.com\\/(?:[A-Za-z0-9_.]+\\/)?(reels?|p|tv)\\/([A-Za-z0-9_-]+)';
+function igFromMatch(m){
+  const k = m[1].toLowerCase();
+  const kind = k === 'p' ? 'p' : (k === 'tv' ? 'tv' : 'reel');
+  const base = 'https://www.instagram.com/' + kind + '/' + m[2] + '/';
+  return { kind, code: m[2], url: base, embed: base + 'embed/' };
+}
+function igParse(str){
+  const m = new RegExp(IG_SRC, 'i').exec(str || '');
+  return m ? igFromMatch(m) : null;
+}
+function igExtractAll(text){
+  const re = new RegExp(IG_SRC, 'gi'); const out = []; let m;
+  while((m = re.exec(text || ''))) out.push(igFromMatch(m));
+  return out;
+}
+
+/* ============ LOCAL CACHE (so the site never goes blank if the database is slow/unreachable) ============ */
+const CACHE_KEY = 'rs_cache_v2', COVER_KEY = 'rs_covers_v2';
+function readCache(){
+  try{ const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && Array.isArray(c.projects) ? c : null; }
+  catch(e){ return null; }
+}
+function readCovers(){ try{ return JSON.parse(localStorage.getItem(COVER_KEY) || '{}') || {}; }catch(e){ return {}; } }
+function writeCache(){
+  try{
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      ts: Date.now(),
+      projects: PROJECTS.map(p => ({...p, cover: undefined, gallery: undefined})),
+      settings: {...SETTINGS, reelPoster: undefined}
+    }));
+  }catch(e){}
+}
+function writeCovers(){
+  try{
+    const o = {};
+    PROJECTS.forEach(p => { const s = SEED_BY_ID[p.id]; if(p.cover && (!s || s.cover !== p.cover)) o[p.id] = p.cover; });
+    localStorage.setItem(COVER_KEY, JSON.stringify(o));
+  }catch(e){}
+}
+
+/* ============ LOADING FROM THE DATABASE ============ */
+/* Light query: everything EXCEPT the (huge) base64 images, so reels & text appear right away. */
+const LIGHT_SELECT = 'id,data->>section,data->>title,data->>year,data->tags,data->>desc,data->>igUrl,data->>addedAt,data->links';
+
+function rowToProject(r){
+  return {
+    id: r.id, section: r.section || 'featured', title: r.title || '', year: r.year || '',
+    tags: Array.isArray(r.tags) ? r.tags : tagsToArr(r.tags),
+    desc: r.desc || '', igUrl: r.igUrl || '', addedAt: Number(r.addedAt) || 0,
+    links: Array.isArray(r.links) ? r.links : [], cover: '', gallery: []
+  };
+}
+function hydrateProject(p, prevMap, covers){
+  const prev = prevMap[p.id], seed = SEED_BY_ID[p.id];
+  if(prev){ p.cover = prev.cover; p.gallery = prev.gallery; }
+  else {
+    p.cover = covers[p.id] !== undefined ? covers[p.id] : (seed ? seed.cover : '');
+    p.gallery = seed ? seed.gallery : (p.cover ? [p.cover] : []);
+  }
+  return p;
+}
+async function fetchRemoteProjects(){
+  try{
+    const rows = await withRetry(() => sbReq('/projects?select=' + LIGHT_SELECT, { timeout: 15000 }), 3);
+    if(rows.length && !('section' in rows[0])) throw new Error('unexpected response shape');
+    return { list: rows.map(rowToProject), full: false };
+  }catch(e){
+    console.warn('Light load failed, falling back to full load', e);
+    const rows = await withRetry(() => sbReq('/projects?select=data', { timeout: 45000 }), 2);
+    return { list: rows.map(r => r.data).filter(Boolean), full: true };
+  }
+}
+
+let syncing = false, retryTimer = null, retryCount = 0;
+async function syncFromRemote(){
+  if(!REMOTE || syncing) return;
+  syncing = true;
+  try{
+    let { list, full } = await fetchRemoteProjects();
+    if(!list.length){
+      /* the table is genuinely empty (the request itself succeeded) -> seed it once */
+      console.warn('Projects table is empty — seeding defaults');
+      list = seedProjects(); full = true;
+      try{ await sbUpsertRows('projects', list.map(p => ({id: p.id, data: p})), 8); }catch(e){ console.error('seeding failed', e); }
+    }
+    const prevMap = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+    const covers = readCovers();
+    PROJECTS = full ? list : list.map(p => hydrateProject(p, prevMap, covers));
+    if(full){ HEAVY_READY = true; PROJECTS.forEach(p => GALLERY_LOADED.add(p.id)); }
+    sortProjects();
+    REELS_STATE = 'ready';
+    SYNC_STATUS = 'ok'; LAST_SYNC = Date.now(); retryCount = 0;
+    writeCache();
+    renderAll();
+
+    /* settings — never overwrite saved settings just because a request failed */
+    try{
+      const s = await withRetry(() => sbReq('/settings?id=eq.main&select=data'), 2);
+      if(s && s.length && s[0].data){ SETTINGS = {...defaultSettings(), ...s[0].data}; }
+      else {
+        SETTINGS = defaultSettings();
+        try{ await sbUpsertRows('settings', [{id: 'main', data: SETTINGS}]); }catch(e){}
+      }
+      SETTINGS_SYNCED = true; SETTINGS_KNOWN = true;
+      writeCache(); renderSettings();
+    }catch(e){ console.warn('Settings load failed (keeping cached/default values)', e); }
+
+    if(!full) loadCovers();
+    refreshBackendStatus();
+  }catch(e){
+    console.error('Sync failed', e);
+    SYNC_STATUS = 'error';
+    if(REELS_STATE === 'loading'){ REELS_STATE = 'error'; renderReels(); }
+    refreshBackendStatus();
+    retryCount++;
+    clearTimeout(retryTimer);
+    retryTimer = setTimeout(syncFromRemote, Math.min(60000, 4000 * Math.pow(2, retryCount)));
+  }finally{ syncing = false; }
+}
+
+let coversRetried = false;
+async function loadCovers(){
+  try{
+    const rows = await withRetry(() => sbReq('/projects?select=id,data->>cover', { timeout: 60000 }), 2);
+    const map = Object.fromEntries(PROJECTS.map(p => [p.id, p]));
+    let changed = false;
+    rows.forEach(r => {
+      const p = map[r.id]; if(!p) return;
+      const c = r.cover || '';
+      if(p.cover !== c){
+        p.cover = c; changed = true;
+        if(!GALLERY_LOADED.has(p.id) && !SEED_BY_ID[p.id]) p.gallery = c ? [c] : [];
+      }
+    });
+    HEAVY_READY = true;
+    writeCovers();
+    if(changed) renderAll();
+  }catch(e){
+    console.warn('Cover load failed', e);
+    if(!coversRetried){ coversRetried = true; setTimeout(loadCovers, 30000); }
+  }
+}
+async function ensureGallery(p){
+  if(!REMOTE || GALLERY_LOADED.has(p.id) || p.section === 'reels') return;
+  try{
+    const rows = await sbReq('/projects?id=eq.' + encodeURIComponent(p.id) + '&select=data->gallery', { timeout: 20000 });
+    if(rows && rows[0] && Array.isArray(rows[0].gallery)) p.gallery = rows[0].gallery;
+    GALLERY_LOADED.add(p.id);
+  }catch(e){}
+}
+
+/* ============ SAVING ============ */
+async function persistProjects(){
+  if(REMOTE) return;
+  if(hasStorage()) await storeSet('portfolio:projects', PROJECTS, true);
+}
+async function persistSettings(){
+  if(REMOTE){ await sbUpsertRows('settings', [{id: 'main', data: SETTINGS}]); return; }
+  if(hasStorage()) await storeSet('portfolio:settings', SETTINGS, true);
+}
+/* returns true/false and tells the user when a save fails (no more silent failures) */
+async function saveProjects(list){
+  try{
+    if(REMOTE) await sbUpsertRows('projects', list.map(p => ({id: p.id, data: p})));
+    else await persistProjects();
+    return true;
+  }catch(e){
+    console.error('Save failed', e);
+    showToast('Could not save to the database — nothing was changed. (' + String(e.message).slice(0, 60) + ')');
+    return false;
+  }
+}
+async function deleteProjectsRemote(ids){
+  if(REMOTE) await sbDeleteIds(ids); else await persistProjects();
+}
 
 /* ============ INIT ============ */
 async function init(){
-  if(usingSupabase()){
-    let p = await sbGetProjects();
-    if(!p || !p.length){
-      p = seedProjects();
-      for(const proj of p) await sbUpsertProject(proj);
+  if(REMOTE){
+    const cache = readCache();
+    if(cache){
+      const covers = readCovers();
+      PROJECTS = cache.projects.map(p => hydrateProject({...p}, {}, covers));
+      SETTINGS = {...defaultSettings(), ...(cache.settings || {})};
+      REELS_STATE = 'ready';
+    } else {
+      PROJECTS = seedProjects().filter(p => p.section !== 'reels');
+      SETTINGS = defaultSettings();
+      REELS_STATE = 'loading';
+      SETTINGS_KNOWN = false;
     }
-    PROJECTS = p;
-    let s = await sbGetSettings();
-    if(!s){ s = defaultSettings(); await sbSetSettings(s); }
-    SETTINGS = {...defaultSettings(), ...s};
-  } else if(hasStorage()){
+    firstPaint();
+    syncFromRemote();
+    return;
+  }
+  if(hasStorage()){
     let p = await storeGet('portfolio:projects', true);
     if(!p){ p = seedProjects(); await storeSet('portfolio:projects', p, true); }
     PROJECTS = p;
@@ -925,140 +1189,200 @@ async function init(){
     PROJECTS = seedProjects();
     SETTINGS = defaultSettings();
   }
+  firstPaint();
+}
+function firstPaint(){
+  sortProjects();
   renderAll();
-  buildScrubberMarks();
-  requestAnimationFrame(()=>{
-    document.getElementById('lbTop').classList.add('reveal');
-    document.getElementById('lbBottom').classList.add('reveal');
+  observeReveals();
+  measure();
+  requestAnimationFrame(() => {
+    $('lbTop').classList.add('reveal');
+    $('lbBottom').classList.add('reveal');
   });
 }
 
-async function persistProjects(){
-  if(usingSupabase()) return; /* individual project writes handled at call sites for supabase */
-  if(hasStorage()) await storeSet('portfolio:projects', PROJECTS, true);
-}
-async function persistSettings(){
-  if(usingSupabase()){ await sbSetSettings(SETTINGS); return; }
-  if(hasStorage()) await storeSet('portfolio:settings', SETTINGS, true);
-}
+/* re-sync when the visitor comes back to the tab after a while, or the connection returns */
+document.addEventListener('visibilitychange', () => { if(!document.hidden && REMOTE && Date.now() - LAST_SYNC > 5 * 60 * 1000) syncFromRemote(); });
+window.addEventListener('online', () => { if(REMOTE) syncFromRemote(); });
 
 /* ============ RENDER ============ */
-function tagsToArr(t){ return Array.isArray(t) ? t : String(t||'').split(',').map(s=>s.trim()).filter(Boolean); }
-
 function fallbackCard(title){
   const hues = ['#FF6B35','#2BD9C0','#8f3f21','#175f54'];
   const c = hues[Math.abs(hashStr(title))%hues.length];
   return `<div class="cover-fallback" style="background:linear-gradient(135deg,${c}22,#141416);color:${c};border:1px solid ${c}44;">${escapeHtml(title)}</div>`;
 }
-function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i); h|=0;} return h; }
-function escapeHtml(s){ const d=document.createElement('div'); d.innerText=s||''; return d.innerHTML; }
+const tagLine = (p, sep) => tagsToArr(p.tags).map(escapeHtml).join(sep);
 
 function renderSoftware(){
-  const el = document.getElementById('softwareGrid');
-  el.innerHTML = SOFTWARE.map((s,i)=>`<span class="chip"><span class="idx mono">${String(i+1).padStart(2,'0')}</span>${s}</span>`).join('');
+  $('softwareGrid').innerHTML = SOFTWARE.map((s,i)=>`<span class="chip"><span class="idx mono">${String(i+1).padStart(2,'0')}</span>${s}</span>`).join('');
 }
 
 function renderFilters(){
   const cats = ["all", ...new Set(PROJECTS.filter(p=>p.section==='featured').flatMap(p=>tagsToArr(p.tags)))];
-  const el = document.getElementById('filterRow');
+  if(!cats.includes(currentFilter)) currentFilter = 'all';
+  const el = $('filterRow');
   el.innerHTML = cats.map(c=>`<button class="filter-btn ${c===currentFilter?'active':''}" data-filter="${escapeHtml(c)}">${c==='all'?'All':escapeHtml(c)}</button>`).join('');
   el.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click', ()=>{ currentFilter=b.dataset.filter; renderFilters(); renderWork(); }));
 }
 
 function renderWork(){
-  const el = document.getElementById('workGrid');
+  const el = $('workGrid');
   let list = PROJECTS.filter(p=>p.section==='featured');
   if(currentFilter!=='all') list = list.filter(p=>tagsToArr(p.tags).includes(currentFilter));
   if(!list.length){ el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">No projects here yet. Open the admin panel to add your first one.</div>`; return; }
   el.innerHTML = list.map(p=>`
-    <div class="work-card" data-id="${p.id}">
-      ${p.cover ? `<img class="cover" src="${p.cover}" loading="lazy">` : fallbackCard(p.title)}
+    <div class="work-card" data-id="${escapeHtml(p.id)}">
+      ${p.cover ? `<img class="cover" src="${escapeHtml(p.cover)}" loading="lazy" decoding="async" alt="${escapeHtml(p.title)}">` : fallbackCard(p.title)}
       <div class="scrim"></div>
       <div class="scan"></div>
       ${p.year ? `<span class="tc-tag mono">${escapeHtml(p.year)}</span>` : ''}
       <div class="meta">
         <div class="ptitle">${escapeHtml(p.title)}</div>
-        <div class="ptags">${tagsToArr(p.tags).join(' · ')}</div>
+        <div class="ptags">${tagLine(p,' · ')}</div>
       </div>
     </div>`).join('');
   el.querySelectorAll('.work-card').forEach(c=>c.addEventListener('click', ()=>openModal(c.dataset.id)));
 }
 
 function renderPast(){
-  const el = document.getElementById('pastGrid');
+  const el = $('pastGrid');
   const list = PROJECTS.filter(p=>p.section==='past');
   el.innerHTML = list.map(p=>`
-    <div class="past-card" data-id="${p.id}">
-      ${p.cover ? `<img src="${p.cover}" loading="lazy">` : fallbackCard(p.title)}
+    <div class="past-card" data-id="${escapeHtml(p.id)}">
+      ${p.cover ? `<img src="${escapeHtml(p.cover)}" loading="lazy" decoding="async" alt="${escapeHtml(p.title)}">` : fallbackCard(p.title)}
       <div class="pc-label">${escapeHtml(p.title)}</div>
     </div>`).join('');
   el.querySelectorAll('.past-card').forEach(c=>c.addEventListener('click', ()=>openModal(c.dataset.id)));
 }
 
 function renderAlbums(){
-  const el = document.getElementById('albumStrip');
+  const el = $('albumStrip');
   const list = PROJECTS.filter(p=>p.section==='album');
   el.innerHTML = list.map(p=>`
-    <div class="film-card" data-id="${p.id}">
-      ${p.cover ? `<img class="film-cover" src="${p.cover}" loading="lazy">` : `<div class="film-cover" style="display:flex;align-items:center;justify-content:center;font-family:Anton,sans-serif;text-align:center;padding:10px;color:var(--paper-faint);">${escapeHtml(p.title)}</div>`}
-      <div class="film-cap"><b>${escapeHtml(p.title)}</b>${tagsToArr(p.tags).join(', ')}</div>
+    <div class="film-card" data-id="${escapeHtml(p.id)}">
+      ${p.cover ? `<img class="film-cover" src="${escapeHtml(p.cover)}" loading="lazy" decoding="async" alt="${escapeHtml(p.title)}">` : `<div class="film-cover" style="display:flex;align-items:center;justify-content:center;font-family:Anton,sans-serif;text-align:center;padding:10px;color:var(--paper-faint);">${escapeHtml(p.title)}</div>`}
+      <div class="film-cap"><b>${escapeHtml(p.title)}</b>${tagLine(p,', ')}</div>
     </div>`).join('');
   el.querySelectorAll('.film-card').forEach(c=>c.addEventListener('click', ()=>openModal(c.dataset.id)));
 }
 
 function renderThreeD(){
-  const el = document.getElementById('threedGrid');
+  const el = $('threedGrid');
   const list = PROJECTS.filter(p=>p.section==='threed');
   el.innerHTML = list.map(p=>`
-    <div class="threed-card ${p.cover?'':'fallback'}" data-id="${p.id}">
-      ${p.cover ? `<img src="${p.cover}" loading="lazy"><span class="tlabel">${escapeHtml(p.title)}</span>` : escapeHtml(p.title)}
+    <div class="threed-card ${p.cover?'':'fallback'}" data-id="${escapeHtml(p.id)}">
+      ${p.cover ? `<img src="${escapeHtml(p.cover)}" loading="lazy" decoding="async" alt="${escapeHtml(p.title)}"><span class="tlabel">${escapeHtml(p.title)}</span>` : escapeHtml(p.title)}
     </div>`).join('');
   el.querySelectorAll('.threed-card').forEach(c=>c.addEventListener('click', ()=>openModal(c.dataset.id)));
 }
 
 function renderReel(){
-  document.getElementById('reelPoster').src = SETTINGS.reelPoster || IMG.hero_kheefa;
+  $('reelPoster').src = SETTINGS.reelPoster || IMG.hero_kheefa;
 }
 
-/* ---- Instagram reels embed ---- */
-function ensureInstagramEmbedScript(cb){
-  if(window.instgrm && window.instgrm.Embeds){ cb(); return; }
-  const existing = document.getElementById('igEmbedScript');
-  if(existing){ existing.addEventListener('load', cb); if(window.instgrm) cb(); return; }
-  const s = document.createElement('script');
-  s.id = 'igEmbedScript';
-  s.async = true;
-  s.src = 'https://www.instagram.com/embed.js';
-  s.onload = cb;
-  document.body.appendChild(s);
+/* ---- Instagram reels: lightweight lazy iframes (no embed.js, never a blank section) ---- */
+const embedIO = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
+  entries.forEach(en => { if(en.isIntersecting){ mountEmbed(en.target); embedIO.unobserve(en.target); } });
+}, { rootMargin: '700px 0px' }) : null;
+
+function mountEmbed(frame){
+  const src = frame.dataset.embed;
+  if(!src || frame.querySelector('iframe')) return;
+  const f = document.createElement('iframe');
+  f.src = src;
+  f.title = 'Instagram reel';
+  f.loading = 'lazy';
+  f.setAttribute('scrolling', 'no');
+  f.setAttribute('allowtransparency', 'true');
+  f.allowFullscreen = true;
+  f.addEventListener('load', () => frame.classList.add('loaded'));
+  frame.appendChild(f);
+  setTimeout(() => { if(!frame.classList.contains('loaded')) frame.classList.add('failed'); }, 12000);
+}
+/* Instagram's embed page tells us its real height, exactly like embed.js does */
+window.addEventListener('message', (e) => {
+  if(!/(^|\.)instagram\.com$/.test((e.origin || '').replace(/^https?:\/\//, ''))) return;
+  let d = e.data;
+  if(typeof d === 'string'){ try{ d = JSON.parse(d); }catch(err){ return; } }
+  if(!d || d.type !== 'MEASURE' || !d.details || !d.details.height) return;
+  document.querySelectorAll('.reel-embed-frame iframe').forEach(f => {
+    if(f.contentWindow === e.source){
+      const fr = f.parentElement;
+      fr.style.aspectRatio = 'auto';
+      fr.style.height = Math.ceil(d.details.height) + 'px';
+    }
+  });
+});
+
+function reelCardHTML(p){
+  const ig = igParse(p.igUrl);
+  const url = ig ? ig.url : (safeUrl(p.igUrl) || '#');
+  return `
+    <div class="reel-embed-card" data-id="${escapeHtml(p.id)}" data-key="${escapeHtml(p.id + '|' + p.igUrl + '|' + p.title)}">
+      <div class="reel-embed-frame" ${ig ? `data-embed="${escapeHtml(ig.embed)}"` : ''}>
+        <div class="reel-embed-ph">
+          <span class="ph-load mono">Loading reel…</span>
+          <a class="ph-fail mono" href="${escapeHtml(url)}" target="_blank" rel="noopener">Preview unavailable — open on Instagram ↗</a>
+        </div>
+      </div>
+      <div class="reel-embed-foot">
+        ${p.title ? `<span class="reel-embed-cap">${escapeHtml(p.title)}</span>` : '<span></span>'}
+        <a class="reel-embed-link mono" href="${escapeHtml(url)}" target="_blank" rel="noopener">View on Instagram ↗</a>
+      </div>
+    </div>`;
 }
 
 function renderReels(){
-  const el = document.getElementById('reelsGrid');
-  const list = PROJECTS.filter(p=>p.section==='reels' && p.igUrl);
-  if(!list.length){
-    el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">No reels added yet. Open the admin panel and paste your first Instagram reel link.</div>`;
+  const el = $('reelsGrid'), more = $('reelsMore');
+  const all = reelList();
+  more.innerHTML = '';
+
+  if(!all.length){
+    if(REELS_STATE === 'loading'){ el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">Loading reels…</div>`; return; }
+    if(REELS_STATE === 'error'){
+      el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">Couldn't load the reels right now. <button class="btn btn-outline" id="reelsRetry" style="margin-left:10px;padding:8px 16px;font-size:11px;">Try again</button></div>`;
+      $('reelsRetry').addEventListener('click', () => { REELS_STATE = 'loading'; renderReels(); syncFromRemote(); });
+      return;
+    }
+    el.innerHTML = `<div class="empty-hint" style="grid-column:1/-1;">No reels added yet. Open the admin panel and paste your Instagram reel links.</div>`;
     return;
   }
-  el.innerHTML = list.map(p=>`
-    <div class="reel-embed-card">
-      <blockquote class="instagram-media" data-instgrm-permalink="${escapeHtml(p.igUrl)}" data-instgrm-version="14"></blockquote>
-      <div class="reel-embed-foot">
-        ${p.title? `<span class="reel-embed-cap">${escapeHtml(p.title)}</span>` : '<span></span>'}
-        <a class="reel-embed-link mono" href="${escapeHtml(p.igUrl)}" target="_blank" rel="noopener">View on Instagram ↗</a>
-      </div>
-    </div>`).join('');
-  ensureInstagramEmbedScript(()=>{ if(window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); });
+
+  const shown = all.slice(0, reelsVisible);
+  const want = shown.map(p => p.id + '|' + p.igUrl + '|' + p.title);
+  const cur = Array.from(el.querySelectorAll('.reel-embed-card')).map(c => c.dataset.key);
+  const prefixOk = cur.length > 0 && cur.length <= want.length && cur.every((k, i) => k === want[i]);
+  if(prefixOk){
+    if(cur.length < want.length) el.insertAdjacentHTML('beforeend', shown.slice(cur.length).map(reelCardHTML).join(''));
+  } else {
+    el.innerHTML = shown.map(reelCardHTML).join('');
+  }
+  el.querySelectorAll('.reel-embed-frame[data-embed]:not([data-obs])').forEach(fr => {
+    fr.dataset.obs = '1';
+    if(embedIO) embedIO.observe(fr); else mountEmbed(fr);
+  });
+
+  if(all.length > shown.length){
+    const left = all.length - shown.length;
+    more.innerHTML = `<button class="btn btn-outline" id="reelsMoreBtn">Show more reels (${left} more) ↓</button>`;
+    $('reelsMoreBtn').addEventListener('click', () => { reelsVisible += REELS_PAGE; renderReels(); });
+  }
 }
 
 function renderHeroText(){
-  document.getElementById('logoText').textContent = SETTINGS.logoText || 'RS';
-  document.getElementById('heroLine1').textContent = SETTINGS.heroLine1 || 'RICHIN';
-  document.getElementById('heroLine2').textContent = SETTINGS.heroLine2 || 'SURESH';
-  document.getElementById('heroRoleVal').textContent = SETTINGS.heroRole || 'Digital Creator';
-  document.getElementById('heroBaseVal').textContent = SETTINGS.heroBase || 'Kerala, India';
-  document.getElementById('heroTagline').textContent = SETTINGS.heroTagline || '';
+  $('logoText').textContent = SETTINGS.logoText || 'RS';
+  $('heroLine1').textContent = SETTINGS.heroLine1 || 'RICHIN';
+  $('heroLine2').textContent = SETTINGS.heroLine2 || 'SURESH';
+  $('heroRoleVal').textContent = SETTINGS.heroRole || 'Digital Creator';
+  $('heroBaseVal').textContent = SETTINGS.heroBase || 'Kerala, India';
+  $('heroTagline').textContent = SETTINGS.heroTagline || '';
   document.title = (SETTINGS.heroLine1||'Richin') + ' ' + (SETTINGS.heroLine2||'Suresh') + ' — ' + (SETTINGS.heroRole||'Digital Creator');
+}
+function renderSettings(){
+  renderHeroText();
+  renderReel();
+  $('whatsappLink').href = safeUrl(SETTINGS.whatsapp) || 'https://wa.me/';
 }
 
 function renderAll(){
@@ -1069,33 +1393,36 @@ function renderAll(){
   renderPast();
   renderAlbums();
   renderThreeD();
-  renderReel();
-  renderHeroText();
-  document.getElementById('whatsappLink').href = SETTINGS.whatsapp || 'https://wa.me/';
-  if(document.getElementById('adminPanelBackdrop').classList.contains('show')) renderAdminList();
+  renderSettings();
+  if($('adminPanelBackdrop').classList.contains('show')) renderAdminList();
 }
 
 /* ============ MODAL ============ */
+let modalOpenId = null;
+function renderModalGallery(p){
+  const gal = (p.gallery && p.gallery.length) ? p.gallery : (p.cover ? [p.cover] : []);
+  $('modalGallery').innerHTML = gal.map(g=>`<img src="${escapeHtml(g)}" decoding="async" alt="">`).join('');
+}
 function openModal(id){
   const p = PROJECTS.find(x=>x.id===id);
   if(!p) return;
-  const modal = document.getElementById('projectModal');
-  document.getElementById('modalHero').src = p.cover || (p.gallery && p.gallery[0]) || IMG.hero_kheefa;
-  document.getElementById('modalYear').textContent = (p.year? p.year+' — ' : '') + 'Project File';
-  document.getElementById('modalTitle').textContent = p.title;
-  document.getElementById('modalTags').textContent = tagsToArr(p.tags).join(' · ');
-  document.getElementById('modalDesc').textContent = p.desc || '';
-  const gal = (p.gallery && p.gallery.length) ? p.gallery : [];
-  document.getElementById('modalGallery').innerHTML = gal.map(g=>`<img src="${g}">`).join('');
-  document.getElementById('modalLinks').innerHTML = (p.links||[]).map(l=>`<a class="btn btn-outline" href="${l.url}" target="_blank">${escapeHtml(l.label||'View')} ↗</a>`).join('');
-  modal.classList.add('show');
+  modalOpenId = id;
+  $('modalHero').src = p.cover || (p.gallery && p.gallery[0]) || IMG.hero_kheefa;
+  $('modalYear').textContent = (p.year? p.year+' — ' : '') + 'Project File';
+  $('modalTitle').textContent = p.title;
+  $('modalTags').textContent = tagsToArr(p.tags).join(' · ');
+  $('modalDesc').textContent = p.desc || '';
+  renderModalGallery(p);
+  $('modalLinks').innerHTML = (p.links||[]).map(l=>{ const u = safeUrl(l.url); return u ? `<a class="btn btn-outline" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(l.label||'View')} ↗</a>` : ''; }).join('');
+  $('projectModal').classList.add('show');
+  ensureGallery(p).then(() => { if(modalOpenId === id) renderModalGallery(p); });
 }
-document.getElementById('modalCloseBtn').addEventListener('click', ()=>document.getElementById('projectModal').classList.remove('show'));
-document.getElementById('projectModal').addEventListener('click', (e)=>{ if(e.target.id==='projectModal') e.currentTarget.classList.remove('show'); });
+$('modalCloseBtn').addEventListener('click', ()=>{ modalOpenId = null; $('projectModal').classList.remove('show'); });
+$('projectModal').addEventListener('click', (e)=>{ if(e.target.id==='projectModal'){ modalOpenId = null; e.currentTarget.classList.remove('show'); } });
 
-/* ============ REEL PLAY ============ */
-document.getElementById('reelPlayBtn').addEventListener('click', ()=>{
-  const frame = document.getElementById('reelFrame');
+/* ============ FEATURED REEL PLAY ============ */
+$('reelPlayBtn').addEventListener('click', ()=>{
+  const frame = $('reelFrame');
   const url = SETTINGS.reelUrl || '';
   const idMatch = url.match(/(?:youtu\.be\/|v=)([a-zA-Z0-9_-]+)/);
   const vid = idMatch ? idMatch[1] : '';
@@ -1109,12 +1436,14 @@ document.getElementById('reelPlayBtn').addEventListener('click', ()=>{
   frame.appendChild(iframe);
 });
 
-/* ============ SCROLL FX: header, scrubber, reveals ============ */
-const header = document.getElementById('siteHeader');
-const scrubberFill = document.getElementById('scrubberFill');
-const scrubberPlay = document.getElementById('scrubberPlay');
-const tcNow = document.getElementById('tcNow');
+/* ============ SCROLL FX (throttled with rAF, no layout reads while scrolling) ============ */
+const header = $('siteHeader');
+const scrubberFill = $('scrubberFill');
+const scrubberPlay = $('scrubberPlay');
+const scrubberTrack = $('scrubberTrack');
+const tcNow = $('tcNow');
 const TOTAL_SECONDS = 221; // fake reel runtime 00:03:41:00
+let docH = 0, trackW = 0, ticking = false, lastTC = '', lastScrolled = null;
 
 function fmtTC(totalSeconds){
   const h = Math.floor(totalSeconds/3600);
@@ -1123,27 +1452,28 @@ function fmtTC(totalSeconds){
   const f = Math.floor((totalSeconds%1)*24);
   return [h,m,s,f].map(n=>String(n).padStart(2,'0')).join(':');
 }
-
-function onScroll(){
-  const scrollTop = window.scrollY;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const pct = docHeight>0 ? Math.min(1, scrollTop/docHeight) : 0;
-  scrubberFill.style.width = (pct*100)+'%';
-  scrubberPlay.style.left = (pct*100)+'%';
-  tcNow.textContent = fmtTC(pct*TOTAL_SECONDS);
-  header.classList.toggle('scrolled', scrollTop>60);
+function paintScroll(){
+  ticking = false;
+  const y = window.scrollY;
+  const pct = docH > 0 ? Math.min(1, y / docH) : 0;
+  scrubberFill.style.transform = 'scaleX(' + pct + ')';
+  scrubberPlay.style.transform = 'translate(' + (pct * trackW - 4) + 'px,-50%)';
+  const tc = fmtTC(pct * TOTAL_SECONDS);
+  if(tc !== lastTC){ tcNow.textContent = tc; lastTC = tc; }
+  const sc = y > 60;
+  if(sc !== lastScrolled){ header.classList.toggle('scrolled', sc); lastScrolled = sc; }
 }
+function onScroll(){ if(!ticking){ ticking = true; requestAnimationFrame(paintScroll); } }
 window.addEventListener('scroll', onScroll, {passive:true});
 
 function buildScrubberMarks(){
-  const track = document.getElementById('scrubberMarks');
+  const track = $('scrubberMarks');
   const sections = ['hero','about','skills','work','reels','past','albums','threed','contact'];
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
   track.innerHTML = '';
   sections.forEach(id=>{
-    const elx = document.getElementById(id);
-    if(!elx || docHeight<=0) return;
-    const pct = Math.min(100, (elx.offsetTop/docHeight)*100);
+    const elx = $(id);
+    if(!elx || docH<=0) return;
+    const pct = Math.min(100, (elx.offsetTop/docH)*100);
     const m = document.createElement('div');
     m.className = 'scrubber-mark';
     m.style.left = pct+'%';
@@ -1152,7 +1482,17 @@ function buildScrubberMarks(){
     track.appendChild(m);
   });
 }
-window.addEventListener('resize', buildScrubberMarks);
+function measure(){
+  docH = document.documentElement.scrollHeight - window.innerHeight;
+  trackW = scrubberTrack.clientWidth;
+  buildScrubberMarks();
+  paintScroll();
+}
+let measureTimer;
+function measureSoon(){ clearTimeout(measureTimer); measureTimer = setTimeout(measure, 200); }
+window.addEventListener('resize', measureSoon);
+window.addEventListener('load', measureSoon);
+if('ResizeObserver' in window) new ResizeObserver(measureSoon).observe(document.body);
 
 const io = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
@@ -1160,114 +1500,192 @@ const io = new IntersectionObserver((entries)=>{
 function observeReveals(){ document.querySelectorAll('.reveal-up:not(.in)').forEach(el=>io.observe(el)); }
 
 /* ============ ADMIN ============ */
-const loginBackdrop = document.getElementById('adminLoginBackdrop');
-const panelBackdrop = document.getElementById('adminPanelBackdrop');
+const loginBackdrop = $('adminLoginBackdrop');
+const panelBackdrop = $('adminPanelBackdrop');
 
-document.getElementById('adminOpenBtn').addEventListener('click', ()=>{
-  document.getElementById('adminPinInput').value='';
-  document.getElementById('adminErr').textContent='';
+$('adminOpenBtn').addEventListener('click', ()=>{
+  $('adminPinInput').value='';
+  $('adminErr').textContent='';
   loginBackdrop.classList.add('show');
-  setTimeout(()=>document.getElementById('adminPinInput').focus(), 100);
+  setTimeout(()=>$('adminPinInput').focus(), 100);
 });
-document.getElementById('adminCancelBtn').addEventListener('click', ()=>loginBackdrop.classList.remove('show'));
+$('adminCancelBtn').addEventListener('click', ()=>loginBackdrop.classList.remove('show'));
 loginBackdrop.addEventListener('click', (e)=>{ if(e.target===loginBackdrop) loginBackdrop.classList.remove('show'); });
 
 function tryLogin(){
-  const val = document.getElementById('adminPinInput').value;
+  const val = $('adminPinInput').value;
   if(val === (SETTINGS.pin || '2580')){
     loginBackdrop.classList.remove('show');
     openAdminPanel();
   } else {
-    document.getElementById('adminErr').textContent = 'Incorrect PIN. Try again.';
+    $('adminErr').textContent = (!SETTINGS_KNOWN && REMOTE) ? 'Still loading your settings — wait a moment and try again.' : 'Incorrect PIN. Try again.';
   }
 }
-document.getElementById('adminSubmitBtn').addEventListener('click', tryLogin);
-document.getElementById('adminPinInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
+$('adminSubmitBtn').addEventListener('click', tryLogin);
+$('adminPinInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryLogin(); });
 
-function openAdminPanel(){
-  panelBackdrop.classList.add('show');
-  renderAdminList();
-  document.getElementById('exportFileName').value = (SETTINGS.heroLine1||'Richin')+'-'+(SETTINGS.heroLine2||'Suresh')+'-Portfolio.pdf';
-  document.getElementById('sReelUrl').value = SETTINGS.reelUrl||'';
-  document.getElementById('sWhatsapp').value = SETTINGS.whatsapp||'';
-  document.getElementById('sPin').value = '';
-  document.getElementById('sLogoText').value = SETTINGS.logoText||'';
-  document.getElementById('sHeroLine1').value = SETTINGS.heroLine1||'';
-  document.getElementById('sHeroLine2').value = SETTINGS.heroLine2||'';
-  document.getElementById('sHeroRole').value = SETTINGS.heroRole||'';
-  document.getElementById('sHeroBase').value = SETTINGS.heroBase||'';
-  document.getElementById('sHeroTagline').value = SETTINGS.heroTagline||'';
-  document.getElementById('reelPosterPreview').src = SETTINGS.reelPoster || '';
-  document.getElementById('reelPosterPreview').style.display = SETTINGS.reelPoster ? 'block':'none';
-  const statusEl = document.getElementById('backendStatus');
-  if(usingSupabase()){
-    statusEl.style.borderColor = 'var(--teal)'; statusEl.style.color = 'var(--teal)';
-    statusEl.textContent = '● Connected to Supabase — changes save permanently and work on any host.';
+function refreshBackendStatus(){
+  const statusEl = $('backendStatus');
+  if(!statusEl) return;
+  if(REMOTE){
+    if(SYNC_STATUS === 'ok'){
+      statusEl.style.borderColor = 'var(--teal)'; statusEl.style.color = 'var(--teal)';
+      statusEl.textContent = '● Connected to Supabase — changes save permanently. Last synced ' + new Date(LAST_SYNC).toLocaleTimeString() + '.';
+    } else if(SYNC_STATUS === 'error'){
+      statusEl.style.borderColor = 'var(--orange)'; statusEl.style.color = 'var(--orange)';
+      statusEl.textContent = '● Can’t reach Supabase right now — showing your last saved copy. New changes will NOT be saved until it reconnects (retrying automatically).';
+    } else {
+      statusEl.style.borderColor = 'var(--paper-faint)'; statusEl.style.color = 'var(--paper-faint)';
+      statusEl.textContent = '● Connecting to Supabase…';
+    }
   } else if(hasClaudeStorage()){
     statusEl.style.borderColor = 'var(--orange)'; statusEl.style.color = 'var(--orange)';
-    statusEl.textContent = '● Using Claude artifact storage — works here, but won\u2019t save once hosted elsewhere (e.g. GitHub Pages) until Supabase keys are added in the code.';
+    statusEl.textContent = '● Using Claude artifact storage — works here, but won’t save once hosted elsewhere (e.g. GitHub Pages) until Supabase keys are added in the code.';
   } else {
     statusEl.style.borderColor = 'var(--paper-faint)'; statusEl.style.color = 'var(--paper-faint)';
     statusEl.textContent = '● No backend connected — changes will be lost on refresh. Add your Supabase URL/key near the top of the script.';
   }
 }
-document.getElementById('adminCloseBtn').addEventListener('click', ()=>panelBackdrop.classList.remove('show'));
+
+function openAdminPanel(){
+  panelBackdrop.classList.add('show');
+  renderAdminList();
+  $('exportFileName').value = (SETTINGS.heroLine1||'Richin')+'-'+(SETTINGS.heroLine2||'Suresh')+'-Portfolio.pdf';
+  $('sReelUrl').value = SETTINGS.reelUrl||'';
+  $('sWhatsapp').value = SETTINGS.whatsapp||'';
+  $('sPin').value = '';
+  $('sLogoText').value = SETTINGS.logoText||'';
+  $('sHeroLine1').value = SETTINGS.heroLine1||'';
+  $('sHeroLine2').value = SETTINGS.heroLine2||'';
+  $('sHeroRole').value = SETTINGS.heroRole||'';
+  $('sHeroBase').value = SETTINGS.heroBase||'';
+  $('sHeroTagline').value = SETTINGS.heroTagline||'';
+  $('reelPosterPreview').src = SETTINGS.reelPoster || '';
+  $('reelPosterPreview').style.display = SETTINGS.reelPoster ? 'block':'none';
+  refreshBackendStatus();
+}
+$('adminCloseBtn').addEventListener('click', ()=>panelBackdrop.classList.remove('show'));
 panelBackdrop.addEventListener('click', (e)=>{ if(e.target===panelBackdrop) panelBackdrop.classList.remove('show'); });
 
+function showTab(name){
+  document.querySelectorAll('.admin-tab').forEach(x=>x.classList.toggle('active', x.dataset.tab===name));
+  ['projects','add','export','settings'].forEach(t=>{
+    $('tab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display = (t===name) ? 'block' : 'none';
+  });
+  if(name==='projects') renderAdminList();
+}
 document.querySelectorAll('.admin-tab').forEach(t=>t.addEventListener('click', ()=>{
-  document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  ['tabProjects','tabAdd','tabExport','tabSettings'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('tab'+t.dataset.tab.charAt(0).toUpperCase()+t.dataset.tab.slice(1)).style.display='block';
-  if(t.dataset.tab==='projects') renderAdminList();
+  const name = t.dataset.tab;
+  if(name==='add' && editingId && !t.classList.contains('active')) clearForm(false); /* don't accidentally overwrite the project you were last editing */
+  showTab(name);
 }));
 
+let adminFilter = 'all';
 function renderAdminList(){
-  const el = document.getElementById('adminList');
+  const el = $('adminList');
   const secLabel = {featured:'Featured Work', reels:'Reels', past:'Archive', album:'Album Art', threed:'3D'};
-  el.innerHTML = PROJECTS.map(p=>`
+  let list = PROJECTS.filter(p => adminFilter==='all' || p.section===adminFilter);
+  if(adminFilter==='reels') list = list.slice().sort((a,b)=>reelTime(b)-reelTime(a));
+  $('adminCount').textContent = list.length + (list.length===1 ? ' item' : ' items');
+  el.innerHTML = list.map(p=>{
+    const ig = p.section==='reels' ? igParse(p.igUrl) : null;
+    const name = p.title || (ig ? 'Reel · ' + ig.code : (p.section==='reels' ? 'Reel' : 'Untitled'));
+    const thumb = p.cover ? `<img src="${escapeHtml(p.cover)}" loading="lazy" decoding="async" alt="" onerror="this.style.opacity=0">` : `<div class="thumb-ph">${p.section==='reels' ? '▶' : ''}</div>`;
+    const sub = p.section==='reels' && ig ? escapeHtml(ig.url.replace('https://www.',''))
+      : (secLabel[p.section]||escapeHtml(p.section)) + (p.year ? ' · '+escapeHtml(p.year) : '');
+    return `
     <div class="admin-list-item">
-      <img src="${p.cover||''}" onerror="this.style.opacity=0">
-      <div class="info"><b>${escapeHtml(p.title)}</b><span>${secLabel[p.section]||p.section} ${p.year? '· '+escapeHtml(p.year):''}</span></div>
+      ${thumb}
+      <div class="info"><b>${escapeHtml(name)}</b><span>${sub}</span></div>
       <div class="admin-list-actions">
-        <button class="icon-btn" data-edit="${p.id}">✎</button>
-        <button class="icon-btn" data-del="${p.id}">🗑</button>
+        <button class="icon-btn" data-edit="${escapeHtml(p.id)}">✎</button>
+        <button class="icon-btn" data-del="${escapeHtml(p.id)}">🗑</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('') || '<p style="color:var(--paper-faint);font-size:13px;">Nothing in this section yet.</p>';
   el.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', ()=>editProject(b.dataset.edit)));
   el.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>deleteProject(b.dataset.del)));
 }
+$('adminFilter').addEventListener('change', (e)=>{ adminFilter = e.target.value; renderAdminList(); });
+$('adminRefreshBtn').addEventListener('click', async ()=>{
+  if(!REMOTE){ showToast('No database connected'); return; }
+  showToast('Refreshing from database…');
+  await syncFromRemote();
+  showToast(SYNC_STATUS==='ok' ? 'Up to date' : 'Could not reach the database');
+});
 
 async function deleteProject(id){
   if(!confirm('Remove this project?')) return;
+  const snapshot = PROJECTS.slice();
   PROJECTS = PROJECTS.filter(p=>p.id!==id);
-  if(usingSupabase()) await sbDeleteProject(id);
-  else await persistProjects();
-  renderAdminList(); renderAll();
+  try{ await deleteProjectsRemote([id]); }
+  catch(e){ console.error(e); PROJECTS = snapshot; showToast('Could not delete — database unreachable'); renderAdminList(); return; }
+  writeCache(); renderAll(); renderAdminList();
   showToast('Project removed');
 }
 
+/* ---- Add / edit form ---- */
 let uploadedCoverData = '';
-function updateAddFormVisibility(){
-  const isReel = document.getElementById('fSection').value === 'reels';
-  document.getElementById('fIgUrlField').style.display = isReel ? 'block' : 'none';
-  document.getElementById('fCoverField').style.display = isReel ? 'none' : 'block';
-  document.getElementById('fLinksField').style.display = isReel ? 'none' : 'block';
-}
-document.getElementById('fSection').addEventListener('change', updateAddFormVisibility);
+const show = (id, on) => { $(id).style.display = on ? '' : 'none'; };
 
-function clearForm(){
+function analyzeBulk(){
+  const text = $('fIgBulk').value;
+  const found = igExtractAll(text);
+  const have = new Set(PROJECTS.filter(p=>p.section==='reels').map(p=>{ const g=igParse(p.igUrl); return g?g.code:null; }).filter(Boolean));
+  const seen = new Set(); const fresh = []; let dupPaste = 0, dupSite = 0;
+  found.forEach(g=>{
+    if(seen.has(g.code)){ dupPaste++; return; }
+    seen.add(g.code);
+    if(have.has(g.code)){ dupSite++; return; }
+    fresh.push(g);
+  });
+  const invalid = text.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).filter(l=>!igExtractAll(l).length).length;
+  return { fresh, dupPaste, dupSite, invalid, total: found.length };
+}
+function refreshBulkInfo(){
+  const isBulk = $('fSection').value==='reels' && !editingId;
+  if(!isBulk) return;
+  const a = analyzeBulk();
+  const bits = [`<b style="color:var(--teal)">${a.fresh.length}</b> new reel${a.fresh.length===1?'':'s'} ready`];
+  if(a.dupSite) bits.push(`${a.dupSite} already on your site (skipped)`);
+  if(a.dupPaste) bits.push(`${a.dupPaste} repeated in your paste (skipped)`);
+  if(a.invalid) bits.push(`${a.invalid} line${a.invalid===1?'':'s'} without an Instagram link (ignored)`);
+  $('fIgBulkInfo').innerHTML = a.total || a.invalid ? bits.join(' · ') : 'Paste links — one per line, or all together. No titles needed.';
+  $('saveProjectBtn').textContent = a.fresh.length ? `Add ${a.fresh.length} Reel${a.fresh.length===1?'':'s'}` : 'Add Reels';
+}
+function updateAddFormVisibility(){
+  const sec = $('fSection').value;
+  const isReel = sec === 'reels';
+  const bulk = isReel && !editingId;
+  show('fTitleField', !bulk);
+  show('fYearField', !isReel);
+  show('fTagsField', !isReel);
+  show('fDescField', !isReel);
+  show('fIgUrlField', isReel && !bulk);
+  show('fIgBulkField', bulk);
+  show('fCoverField', !isReel);
+  show('fLinksField', !isReel);
+  $('fTitleLabel').textContent = isReel ? 'Caption (optional)' : 'Title';
+  $('saveProjectBtn').textContent = bulk ? 'Add Reels' : 'Save Project';
+  refreshBulkInfo();
+}
+$('fSection').addEventListener('change', updateAddFormVisibility);
+$('fIgBulk').addEventListener('input', refreshBulkInfo);
+
+function clearForm(keepSection){
+  const sec = keepSection ? $('fSection').value : 'featured';
   editingId = null;
-  document.getElementById('fTitle').value='';
-  document.getElementById('fYear').value='';
-  document.getElementById('fSection').value='featured';
-  document.getElementById('fIgUrl').value='';
-  document.getElementById('fTags').value='';
-  document.getElementById('fDesc').value='';
-  document.getElementById('uploadPreview').style.display='none';
-  document.getElementById('uploadHint').textContent='Click to upload a cover image (or leave blank for a text-only card)';
+  $('fTitle').value='';
+  $('fYear').value='';
+  $('fSection').value = sec;
+  $('fIgUrl').value='';
+  $('fIgBulk').value='';
+  $('fTags').value='';
+  $('fDesc').value='';
+  $('uploadPreview').style.display='none';
+  $('uploadHint').textContent='Click to upload a cover image (or leave blank for a text-only card)';
   uploadedCoverData='';
-  document.getElementById('linkRows').innerHTML='';
+  $('linkRows').innerHTML='';
   addLinkRow();
   updateAddFormVisibility();
 }
@@ -1276,20 +1694,20 @@ function addLinkRow(label, url){
   row.className='link-row';
   row.innerHTML = `<input type="text" placeholder="Label (e.g. Watch)" class="lLabel" value="${label?escapeHtml(label):''}"><input type="text" placeholder="https://..." class="lUrl" value="${url?escapeHtml(url):''}"><button class="icon-btn removeLinkBtn">✕</button>`;
   row.querySelector('.removeLinkBtn').addEventListener('click', ()=>row.remove());
-  document.getElementById('linkRows').appendChild(row);
+  $('linkRows').appendChild(row);
 }
-document.getElementById('addLinkRowBtn').addEventListener('click', ()=>addLinkRow());
-document.getElementById('resetFormBtn').addEventListener('click', clearForm);
+$('addLinkRowBtn').addEventListener('click', ()=>addLinkRow());
+$('resetFormBtn').addEventListener('click', ()=>clearForm(false));
 
-document.getElementById('fCoverInput').addEventListener('change', (e)=>{
+$('fCoverInput').addEventListener('change', (e)=>{
   const file = e.target.files[0];
   if(!file) return;
   const reader = new FileReader();
   reader.onload = (ev)=>{
     uploadedCoverData = ev.target.result;
-    document.getElementById('uploadPreview').src = uploadedCoverData;
-    document.getElementById('uploadPreview').style.display='block';
-    document.getElementById('uploadHint').textContent = file.name;
+    $('uploadPreview').src = uploadedCoverData;
+    $('uploadPreview').style.display='block';
+    $('uploadHint').textContent = file.name;
   };
   reader.readAsDataURL(file);
 });
@@ -1298,101 +1716,134 @@ function editProject(id){
   const p = PROJECTS.find(x=>x.id===id);
   if(!p) return;
   editingId = id;
-  document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
-  document.querySelector('.admin-tab[data-tab="add"]').classList.add('active');
-  ['tabProjects','tabAdd','tabExport','tabSettings'].forEach(i=>document.getElementById(i).style.display='none');
-  document.getElementById('tabAdd').style.display='block';
-  document.getElementById('fTitle').value = p.title;
-  document.getElementById('fYear').value = p.year||'';
-  document.getElementById('fSection').value = p.section;
-  document.getElementById('fIgUrl').value = p.igUrl||'';
+  showTab('add');
+  $('fTitle').value = p.title || '';
+  $('fYear').value = p.year||'';
+  $('fSection').value = p.section;
+  $('fIgUrl').value = p.igUrl||'';
   updateAddFormVisibility();
-  document.getElementById('fTags').value = tagsToArr(p.tags).join(', ');
-  document.getElementById('fDesc').value = p.desc||'';
+  $('fTags').value = tagsToArr(p.tags).join(', ');
+  $('fDesc').value = p.desc||'';
   uploadedCoverData = p.cover||'';
-  if(p.cover){ document.getElementById('uploadPreview').src=p.cover; document.getElementById('uploadPreview').style.display='block'; }
-  else { document.getElementById('uploadPreview').style.display='none'; }
-  document.getElementById('linkRows').innerHTML='';
+  if(p.cover){ $('uploadPreview').src=p.cover; $('uploadPreview').style.display='block'; }
+  else { $('uploadPreview').style.display='none'; }
+  $('linkRows').innerHTML='';
   (p.links&&p.links.length? p.links : [{label:'',url:''}]).forEach(l=>addLinkRow(l.label,l.url));
 }
 
-document.getElementById('saveProjectBtn').addEventListener('click', async ()=>{
-  const title = document.getElementById('fTitle').value.trim();
-  if(!title){ showToast('Give the project a title first'); return; }
-  if(document.getElementById('fSection').value === 'reels' && !document.getElementById('fIgUrl').value.trim()){
-    showToast('Paste the Instagram reel link first'); return;
-  }
+async function saveReelsBulk(){
+  const a = analyzeBulk();
+  if(!a.fresh.length){ showToast(a.total ? 'Nothing new — those reels are already on your site' : 'Paste at least one Instagram link'); return; }
+  const base = Date.now();
+  /* first pasted link ends up first on the site; the whole batch sits above older reels */
+  const list = a.fresh.map((g,i)=>({
+    id:'r-'+g.code, section:'reels', title:'', year:'', tags:[], desc:'', igUrl:g.url,
+    cover:'', gallery:[], links:[], addedAt: base - i
+  }));
+  const snapshot = PROJECTS.slice();
+  PROJECTS.push(...list);
+  const ok = await saveProjects(list);
+  if(!ok){ PROJECTS = snapshot; return; }     /* pasted text stays in the box so nothing is lost */
+  sortProjects(); writeCache();
+  reelsVisible = Math.max(reelsVisible, REELS_PAGE);
+  renderAll();
+  $('fIgBulk').value = '';
+  refreshBulkInfo();
+  const skipped = a.dupSite + a.dupPaste;
+  showToast(`Added ${list.length} reel${list.length===1?'':'s'}` + (skipped ? ` · ${skipped} duplicate${skipped===1?'':'s'} skipped` : ''));
+}
+
+$('saveProjectBtn').addEventListener('click', async ()=>{
+  const section = $('fSection').value;
+  if(section === 'reels' && !editingId){ return saveReelsBulk(); }
+
+  const title = $('fTitle').value.trim();
+  let ig = null;
+  if(section === 'reels'){
+    ig = igParse($('fIgUrl').value);
+    if(!ig){ showToast('That doesn’t look like an Instagram reel/post link'); return; }
+  } else if(!title){ showToast('Give the project a title first'); return; }
+
+  if(REMOTE && section !== 'reels' && !HEAVY_READY){ showToast('Images are still loading — try again in a few seconds'); return; }
+
+  const prev = editingId ? PROJECTS.find(p=>p.id===editingId) : null;
+  if(prev) await ensureGallery(prev);
+  const isReel = section === 'reels';
+  const cover = isReel ? '' : uploadedCoverData;
+  let gallery = [];
+  if(cover) gallery = (prev && prev.cover === cover && prev.gallery && prev.gallery.length) ? prev.gallery : [cover];
   const links = Array.from(document.querySelectorAll('#linkRows .link-row')).map(r=>({
     label: r.querySelector('.lLabel').value.trim(),
     url: r.querySelector('.lUrl').value.trim()
   })).filter(l=>l.url);
+
   const data = {
-    id: editingId || ('p-'+Date.now()),
-    section: document.getElementById('fSection').value,
-    title,
-    year: document.getElementById('fYear').value.trim(),
-    tags: document.getElementById('fTags').value.split(',').map(s=>s.trim()).filter(Boolean),
-    desc: document.getElementById('fDesc').value.trim(),
-    igUrl: document.getElementById('fIgUrl').value.trim(),
-    cover: uploadedCoverData,
-    gallery: uploadedCoverData ? [uploadedCoverData] : [],
-    links
+    id: editingId || (isReel ? 'r-'+ig.code : 'p-'+Date.now()),
+    section, title,
+    year: isReel ? '' : $('fYear').value.trim(),
+    tags: isReel ? [] : $('fTags').value.split(',').map(s=>s.trim()).filter(Boolean),
+    desc: isReel ? '' : $('fDesc').value.trim(),
+    igUrl: isReel ? ig.url : '',
+    addedAt: (prev && prev.addedAt) || Date.now(),
+    cover, gallery,
+    links: isReel ? [] : links
   };
-  if(editingId){
-    PROJECTS = PROJECTS.map(p=>p.id===editingId? {...p, ...data} : p);
-  } else {
-    PROJECTS.push(data);
-  }
-  if(usingSupabase()) await sbUpsertProject(data);
-  else await persistProjects();
+  const snapshot = PROJECTS.slice();
+  if(prev) PROJECTS = PROJECTS.map(p=>p.id===prev.id ? {...p, ...data} : p);
+  else PROJECTS.push(data);
+  const ok = await saveProjects([data]);
+  if(!ok){ PROJECTS = snapshot; return; }
+  sortProjects(); writeCache(); if(data.cover) writeCovers();
   renderAll();
-  clearForm();
-  document.querySelectorAll('.admin-tab').forEach(x=>x.classList.remove('active'));
-  document.querySelector('.admin-tab[data-tab="projects"]').classList.add('active');
-  ['tabProjects','tabAdd','tabExport','tabSettings'].forEach(i=>document.getElementById(i).style.display='none');
-  document.getElementById('tabProjects').style.display='block';
-  renderAdminList();
-  showToast('Project saved');
+  clearForm(false);
+  showTab('projects');
+  showToast('Saved');
 });
 
-document.getElementById('sReelPosterInput').addEventListener('change', (e)=>{
+$('sReelPosterInput').addEventListener('change', (e)=>{
   const file = e.target.files[0]; if(!file) return;
   const reader = new FileReader();
   reader.onload = (ev)=>{
     SETTINGS.reelPoster = ev.target.result;
-    document.getElementById('reelPosterPreview').src = SETTINGS.reelPoster;
-    document.getElementById('reelPosterPreview').style.display='block';
+    $('reelPosterPreview').src = SETTINGS.reelPoster;
+    $('reelPosterPreview').style.display='block';
   };
   reader.readAsDataURL(file);
 });
 
-document.getElementById('saveSettingsBtn').addEventListener('click', async ()=>{
-  SETTINGS.reelUrl = document.getElementById('sReelUrl').value.trim() || SETTINGS.reelUrl;
-  SETTINGS.whatsapp = document.getElementById('sWhatsapp').value.trim() || SETTINGS.whatsapp;
-  SETTINGS.logoText = document.getElementById('sLogoText').value.trim() || SETTINGS.logoText;
-  SETTINGS.heroLine1 = document.getElementById('sHeroLine1').value.trim() || SETTINGS.heroLine1;
-  SETTINGS.heroLine2 = document.getElementById('sHeroLine2').value.trim() || SETTINGS.heroLine2;
-  SETTINGS.heroRole = document.getElementById('sHeroRole').value.trim() || SETTINGS.heroRole;
-  SETTINGS.heroBase = document.getElementById('sHeroBase').value.trim() || SETTINGS.heroBase;
-  SETTINGS.heroTagline = document.getElementById('sHeroTagline').value.trim() || SETTINGS.heroTagline;
-  const newPin = document.getElementById('sPin').value.trim();
+$('saveSettingsBtn').addEventListener('click', async ()=>{
+  if(REMOTE && !SETTINGS_SYNCED){ showToast('Still loading your saved settings — try again in a moment'); return; }
+  SETTINGS.reelUrl = $('sReelUrl').value.trim() || SETTINGS.reelUrl;
+  SETTINGS.whatsapp = $('sWhatsapp').value.trim() || SETTINGS.whatsapp;
+  SETTINGS.logoText = $('sLogoText').value.trim() || SETTINGS.logoText;
+  SETTINGS.heroLine1 = $('sHeroLine1').value.trim() || SETTINGS.heroLine1;
+  SETTINGS.heroLine2 = $('sHeroLine2').value.trim() || SETTINGS.heroLine2;
+  SETTINGS.heroRole = $('sHeroRole').value.trim() || SETTINGS.heroRole;
+  SETTINGS.heroBase = $('sHeroBase').value.trim() || SETTINGS.heroBase;
+  SETTINGS.heroTagline = $('sHeroTagline').value.trim() || SETTINGS.heroTagline;
+  const newPin = $('sPin').value.trim();
   if(newPin) SETTINGS.pin = newPin;
-  await persistSettings();
-  renderAll();
+  try{ await persistSettings(); }
+  catch(e){ console.error(e); showToast('Could not save settings — database unreachable'); return; }
+  writeCache(); renderAll();
   showToast('Settings saved');
 });
 
-document.getElementById('resetDataBtn').addEventListener('click', async ()=>{
-  if(!confirm('This replaces all projects with the original default set. Continue?')) return;
+$('resetDataBtn').addEventListener('click', async ()=>{
+  if(!confirm('This replaces all projects (including reels) with the original default set. Continue?')) return;
   const seed = seedProjects();
-  if(usingSupabase()){
-    for(const p of PROJECTS) await sbDeleteProject(p.id);
-    for(const p of seed) await sbUpsertProject(p);
-  }
-  PROJECTS = seed;
-  SETTINGS = defaultSettings();
-  await persistProjects();
-  await persistSettings();
+  try{
+    if(REMOTE){
+      await sbDeleteIds(PROJECTS.map(p=>p.id));
+      await sbUpsertRows('projects', seed.map(p=>({id:p.id, data:p})), 8);
+    } else await persistProjects();
+    PROJECTS = seed;
+    SETTINGS = defaultSettings();
+    GALLERY_LOADED.clear(); seed.forEach(p=>GALLERY_LOADED.add(p.id));
+    await persistProjects();
+    await persistSettings();
+  }catch(e){ console.error(e); showToast('Reset failed — database unreachable'); return; }
+  sortProjects(); writeCache(); writeCovers();
   renderAll();
   renderAdminList();
   showToast('Reset to defaults');
@@ -1401,11 +1852,26 @@ document.getElementById('resetDataBtn').addEventListener('click', async ()=>{
 /* ============ TOAST ============ */
 let toastTimer;
 function showToast(msg){
-  const t = document.getElementById('toast');
+  const t = $('toast');
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 2400);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+/* ============ LAZY SCRIPT LOADER (jsPDF only downloads when you actually export) ============ */
+const scriptPromises = {};
+function loadScript(src){
+  if(!scriptPromises[src]){
+    scriptPromises[src] = new Promise((res, rej)=>{
+      const s = document.createElement('script');
+      s.src = src; s.async = true;
+      s.onload = res;
+      s.onerror = ()=>{ delete scriptPromises[src]; rej(new Error('Failed to load ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+  return scriptPromises[src];
 }
 
 /* ============ PDF EXPORT ============ */
@@ -1417,13 +1883,7 @@ function pdfEnsureSpace(doc, y, needed, pageH, margin){
   return y;
 }
 
-async function exportPortfolioPDF(){
-  const statusEl = document.getElementById('exportStatus');
-  if(!window.jspdf){ statusEl.textContent = 'PDF library failed to load — check your connection and try again.'; return; }
-  statusEl.textContent = 'Building your PDF…';
-  const btn = document.getElementById('exportPdfBtn');
-  btn.disabled = true;
-
+async function buildPortfolioPDF(statusEl){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'pt', format:'a4' });
   const pageW = doc.internal.pageSize.getWidth();
@@ -1545,14 +2005,15 @@ async function exportPortfolioPDF(){
   }
 
   // Reels (Instagram)
-  const reels = PROJECTS.filter(p=>p.section==='reels' && p.igUrl);
+  const reels = reelList();
   if(reels.length){
     sectionHeading('Instagram Reels');
     doc.setFont('helvetica','normal'); doc.setFontSize(9);
     reels.forEach(p=>{
       y = pdfEnsureSpace(doc, y, 14, pageH, margin);
       doc.setTextColor(...orange);
-      doc.textWithLink((p.title? p.title+'  —  ':'') + p.igUrl, margin, y, {url:p.igUrl});
+      const igu = (igParse(p.igUrl) || {url:p.igUrl}).url;
+      doc.textWithLink((p.title? p.title+'  —  ':'') + igu, margin, y, {url:igu});
       y += 13;
     });
     y += 10;
@@ -1572,16 +2033,32 @@ async function exportPortfolioPDF(){
   const filename = (document.getElementById('exportFileName').value.trim() || (name.replace(/\s+/g,'-') + '-Portfolio.pdf'));
   doc.save(filename.endsWith('.pdf') ? filename : filename + '.pdf');
   statusEl.textContent = 'Downloaded. Re-run this any time your projects change.';
-  btn.disabled = false;
 }
 
-document.getElementById('exportPdfBtn').addEventListener('click', exportPortfolioPDF);
+
+async function exportPortfolioPDF(){
+  const statusEl = $('exportStatus');
+  const btn = $('exportPdfBtn');
+  btn.disabled = true;
+  statusEl.textContent = 'Loading PDF library…';
+  try{
+    await loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js');
+    if(!window.jspdf) throw new Error('jsPDF missing');
+    statusEl.textContent = 'Building your PDF…';
+    await buildPortfolioPDF(statusEl);
+  }catch(e){
+    console.error(e);
+    statusEl.textContent = 'PDF export failed — check your connection and try again.';
+  }finally{ btn.disabled = false; }
+}
+
+
+
+$('exportPdfBtn').addEventListener('click', exportPortfolioPDF);
 
 /* ============ BOOT ============ */
-clearForm();
-init().then(()=>{
-  setTimeout(()=>{ onScroll(); buildScrubberMarks(); observeReveals(); }, 50);
-});
+clearForm(false);
+init();
 
 </script>
 
