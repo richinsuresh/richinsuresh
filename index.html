@@ -719,7 +719,8 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
       </div>
 
       <div id="tabSettings" style="display:none;">
-        <div id="backendStatus" style="font-size:12px;padding:10px 14px;border-radius:6px;margin-bottom:22px;border:1px solid var(--line-strong);"></div>
+        <div id="backendStatus" style="font-size:12px;padding:10px 14px;border-radius:6px;margin-bottom:12px;border:1px solid var(--line-strong);"></div>
+        <div style="margin-bottom:22px;"><button class="btn btn-outline" id="connTestBtn" style="padding:8px 16px;font-size:11px;">Test connection</button><div id="connTestOut" style="font-size:12px;line-height:1.7;color:var(--paper-dim);margin-top:12px;"></div></div>
 
         <p class="eyebrow" style="margin-bottom:14px;">Header &amp; Hero Text</p>
         <div class="form-grid">
@@ -800,7 +801,7 @@ const IMG = {
 /* ============ BACKEND CONFIG ============ */
 /* Supabase is talked to directly over its REST API (no supabase-js download needed). */
 const SUPABASE_URL = "https://ooyukxkzyscctgddqcfh.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9veXVreGt6eXNjY3RnZGRxY2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2ODg2MDQsImV4cCI6MjEwMjI2NDYwNH0.6DxpNazw1wWUOnn1DdlRNJPizkG5JvfRF5yFiP0DuEw";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9veXVreGt6eXNjY3RnZGRxY2ZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2ODg2MDQsImV4cCI6MjEwMjI2NDYwNH0.6DxpNazw1wWUOnn1DdlRNJPizkG5JvfRF5yFiP0DuEw";   /* legacy anon key (eyJ…) or the newer publishable key (sb_publishable_…) both work */
 const REMOTE = !!(SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_ANON_KEY);
 const usingSupabase = () => REMOTE;
 /* If your ISP blocks supabase.co (some Indian ISPs do), put your Cloudflare Worker URL here,
@@ -830,7 +831,9 @@ async function sbReq(path, opts = {}){
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeout);
   try{
-    const headers = { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY };
+    const headers = { apikey: SUPABASE_ANON_KEY };
+    /* legacy JWT keys are also sent as a Bearer token; new sb_publishable_… keys are not JWTs and go in apikey only */
+    if(!/^sb_/.test(SUPABASE_ANON_KEY)) headers.Authorization = 'Bearer ' + SUPABASE_ANON_KEY;
     if(body !== undefined) headers['Content-Type'] = 'application/json';
     if(prefer) headers['Prefer'] = prefer;
     const res = await fetch(REST + path, { method, headers, signal: ctrl.signal, body: body !== undefined ? JSON.stringify(body) : undefined });
@@ -1166,13 +1169,57 @@ async function saveProjects(list){
     return true;
   }catch(e){
     console.error('Save failed', e);
-    const netDown = /Failed to fetch|NetworkError|aborted|Load failed/i.test(String(e.message));
-    showToast(netDown ? 'Can’t reach the database (network or ISP block) — nothing was changed.' : 'Could not save to the database — nothing was changed. (' + String(e.message).slice(0, 60) + ')');
+    showToast(dbErrorText(e, 'save'));
     return false;
   }
 }
 async function deleteProjectsRemote(ids){
   if(REMOTE) await sbDeleteIds(ids); else await persistProjects();
+}
+
+
+function dbErrorText(e, what){
+  const netDown = /Failed to fetch|NetworkError|aborted|Load failed/i.test(String(e && e.message));
+  return netDown
+    ? 'Can’t reach the database, so nothing was changed. Open Admin → Settings → “Test connection” to see why.'
+    : 'Could not ' + what + ' — nothing was changed. (' + String(e && e.message).slice(0, 70) + ')';
+}
+
+/* ---- Connection test: tells you whether it's your network, a paused project, or permissions ---- */
+async function runConnectionTest(){
+  const out = $('connTestOut'), btn = $('connTestBtn');
+  if(!REMOTE){ out.textContent = 'No Supabase URL/key is set at the top of the script.'; return; }
+  btn.disabled = true; out.textContent = 'Testing…';
+  const host = (API_BASE || SUPABASE_URL).replace(/\/+$/, '');
+  const hostName = host.replace(/^https?:\/\//, '');
+  const ping = async (url) => {   /* no-cors: resolves if the server is reachable at all, rejects if the network blocks it */
+    const c = new AbortController(); const t = setTimeout(() => c.abort(), 9000);
+    try{ await fetch(url, { mode: 'no-cors', cache: 'no-store', signal: c.signal }); return true; }
+    catch(e){ return false; } finally{ clearTimeout(t); }
+  };
+  const lines = []; const step = (ok, msg) => lines.push((ok ? '✅ ' : '❌ ') + msg);
+
+  const net = await ping('https://www.cloudflare.com/cdn-cgi/trace');
+  step(net, net ? 'Internet connection works' : 'No internet connection detected');
+  const reach = await ping(host + '/rest/v1/');
+  step(reach, reach ? 'Reached ' + hostName : 'Could NOT reach ' + hostName);
+  let apiOk = false, apiErr = '';
+  try{ await sbReq('/projects?select=id&limit=1', { timeout: 10000 }); apiOk = true; }
+  catch(e){ apiErr = String(e.message || e); }
+  step(apiOk, apiOk ? 'Database read works' : 'Database read failed: ' + apiErr.slice(0, 120));
+
+  let verdict;
+  if(!net) verdict = 'You look offline — check your connection and try again.';
+  else if(!reach) verdict = 'Your internet works but your network can’t reach ' + hostName + '. That’s what an ISP block (some Indian ISPs block supabase.co), a DNS filter or an ad-blocker looks like. Confirm by trying mobile data or a VPN, then set up the Cloudflare proxy (API_BASE at the top of the script).';
+  else if(!apiOk && (/Failed to fetch|NetworkError|Load failed|aborted/i.test(apiErr) || /HTTP 5\d\d/.test(apiErr))) verdict = 'The server is reachable but its reply was rejected. Click “Open raw API response” below to see what Supabase actually says: if it mentions a JWT / 401 it is the current Supabase incident “401 errors due to JWT rejections” (status.supabase.com) — see the fix in your project dashboard; if it says the project is paused, click “Restore project” in the Supabase dashboard.';
+  else if(!apiOk && /HTTP 401/.test(apiErr)) verdict = 'Supabase rejected the key (401). If your key is correct, this matches the current Supabase incident “401 errors due to JWT rejections” (status.supabase.com). Otherwise the key is wrong/expired.';
+  else if(!apiOk && /HTTP 403/.test(apiErr)) verdict = 'Supabase refused the request (403) — Row Level Security has no policy allowing reads on the “projects” table.';
+  else if(!apiOk) verdict = 'Supabase answered with an error (shown above). Send me that line and I’ll pinpoint it.';
+  else verdict = 'Reading works. If saving or deleting still fails, your Row Level Security policies probably don’t allow anon INSERT/UPDATE/DELETE on “projects” and “settings”.';
+  const rawUrl = host + '/rest/v1/projects?select=id&limit=1&apikey=' + encodeURIComponent(SUPABASE_ANON_KEY);
+  out.innerHTML = lines.map(escapeHtml).join('<br>') + '<br><br><b>' + escapeHtml(verdict) + '</b>'
+    + (reach ? '<br><br><a href="' + escapeHtml(rawUrl) + '" target="_blank" rel="noopener" style="color:var(--teal);">Open raw API response ↗</a> <span style="color:var(--paper-faint);">(a healthy project shows [ ] or a list of ids)</span>' : '');
+  btn.disabled = false;
 }
 
 /* ============ INIT ============ */
@@ -1637,7 +1684,7 @@ async function deleteProject(id){
   const snapshot = PROJECTS.slice();
   PROJECTS = PROJECTS.filter(p=>p.id!==id);
   try{ await deleteProjectsRemote([id]); }
-  catch(e){ console.error(e); PROJECTS = snapshot; showToast('Could not delete — database unreachable'); renderAdminList(); return; }
+  catch(e){ console.error(e); PROJECTS = snapshot; showToast(dbErrorText(e, 'delete')); renderAdminList(); return; }
   writeCache(); renderAll(); renderAdminList();
   showToast('Project removed');
 }
@@ -2073,6 +2120,7 @@ async function exportPortfolioPDF(){
 
 
 $('exportPdfBtn').addEventListener('click', exportPortfolioPDF);
+$('connTestBtn').addEventListener('click', runConnectionTest);
 
 /* ============ BOOT ============ */
 clearForm(false);
