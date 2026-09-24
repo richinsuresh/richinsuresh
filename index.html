@@ -154,33 +154,30 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 .btn-outline{border:1px solid var(--line-strong);color:var(--paper);}
 .btn-outline:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px);}
 
-/* showreel frame */
+/* showreel frame — ambient looping background video */
 .reel-frame{
   margin-top:64px;position:relative;width:100%;aspect-ratio:16/8.2;border-radius:6px;overflow:hidden;
   border:1px solid var(--line-strong);background:#000;
 }
-.reel-frame img{width:100%;height:100%;object-fit:cover;opacity:0.72;transition:opacity .4s, transform 6s ease;}
-.reel-frame:hover img{opacity:0.5;transform:scale(1.04);}
+.reel-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85;transition:opacity .8s ease;z-index:1;}
+.reel-frame.video-ready img{opacity:0;}
+.reel-bg-wrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.reel-bg-wrap iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:0;}
 .reel-frame::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(11,11,13,0.1) 0%, rgba(11,11,13,0.75) 100%);
+  content:'';position:absolute;inset:0;z-index:2;
+  background:linear-gradient(180deg, rgba(11,11,13,0.15) 0%, rgba(11,11,13,0.6) 100%);
 }
-.reel-play{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:2;
+.reel-label{position:absolute;top:20px;left:20px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:var(--paper-dim);text-transform:uppercase;}
+.reel-watch{
+  position:absolute;top:18px;right:20px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.05em;
+  color:var(--paper-dim);text-transform:uppercase;padding:8px 14px;border:1px solid var(--line-strong);border-radius:100px;
+  background:rgba(11,11,13,0.45);transition:all .25s ease;
 }
-.reel-play-btn{
-  width:76px;height:76px;border-radius:50%;border:1px solid rgba(244,240,230,0.5);
-  display:flex;align-items:center;justify-content:center;
-  transition:all .3s ease;background:rgba(11,11,13,0.45);
-}
-.reel-play-btn::after{content:'';width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:16px solid var(--paper);margin-left:4px;}
-.reel-frame:hover .reel-play-btn{background:var(--orange);border-color:var(--orange);transform:scale(1.08);}
-.reel-label{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.1em;color:var(--paper-dim);text-transform:uppercase;}
-.reel-bars{position:absolute;left:0;right:0;height:9%;background:#000;z-index:1;}
+.reel-watch:hover{color:var(--teal);border-color:var(--teal);}
+.reel-bars{position:absolute;left:0;right:0;height:9%;background:#000;z-index:2;}
 .reel-bars.t{top:0;}
 .reel-bars.b{bottom:0;}
-.reel-tc{position:absolute;bottom:16px;left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);z-index:2;letter-spacing:0.05em;}
-.reel-frame-iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.reel-tc{position:absolute;bottom:16px;left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);z-index:3;letter-spacing:0.05em;}
 
 /* ---------- about ---------- */
 .about-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:start;}
@@ -476,11 +473,10 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
   <div class="reel-frame reveal-up" id="reelFrame">
     <div class="reel-bars t"></div>
     <div class="reel-bars b"></div>
-    <img id="reelPoster" src="" alt="Showreel poster">
-    <div class="reel-play" id="reelPlayBtn">
-      <div class="reel-play-btn"></div>
-      <span class="reel-label mono" id="reelLabel">Play Featured Reel</span>
-    </div>
+    <img id="reelPoster" src="" alt="Showreel background">
+    <div class="reel-bg-wrap" id="reelBgWrap"></div>
+    <span class="reel-label mono">Ambient Showreel</span>
+    <a class="reel-watch mono" id="reelWatchLink" href="#" target="_blank" rel="noopener">Watch with sound ↗</a>
     <span class="reel-tc mono">A_ROLL_01.MOV — 3840×2160</span>
   </div>
 </section>
@@ -734,7 +730,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
         <p class="eyebrow" style="margin:28px 0 14px;">Featured Reel &amp; Contact</p>
         <div class="form-grid">
-          <div class="form-field full"><label>Featured Reel — YouTube URL</label><input type="text" id="sReelUrl" placeholder="https://youtu.be/..."></div>
+          <div class="form-field full"><label>Ambient Background Video — YouTube URL</label><input type="text" id="sReelUrl" placeholder="https://youtu.be/..."><p style="color:var(--paper-dim);font-size:11px;margin-top:6px;">Plays muted and looped behind the hero. Visitors can click “Watch with sound” to open it on YouTube.</p></div>
           <div class="form-field full"><label>Featured Reel — Poster Image</label>
             <label class="upload-box"><input type="file" accept="image/*" id="sReelPosterInput"><span>Click to upload a poster frame</span></label>
             <img id="reelPosterPreview" class="upload-preview" style="display:none;">
@@ -941,8 +937,8 @@ function seedProjects(){
     {id:"a-diebyyourside", section:"album", title:"To Die By Your Side", year:"", tags:["Design Practice"], desc:"Personal album-art redesign, done as practice.", cover:IMG.album_diebyyourside, gallery:[], links:[]},
 
     {id:"t-hawkins", section:"threed", title:"Environment Study — Hawkins", year:"", tags:["3D Environment"], desc:"A moody 3D forest-sign environment build.", cover:IMG.threeD_hawkins, gallery:[], links:[]},
-    {id:"t-tube", section:"threed", title:"Product Visualization", year:"", tags:["3D Product"], desc:"Studio-lit fluid/product render study.", cover:IMG.threeD_tube, gallery:[], links:[]},
-    {id:"t-rain", section:"threed", title:"Rain Mood Piece", year:"", tags:["3D Animation"], desc:"Atmospheric rain scene, lookdev and lighting study.", cover:IMG.threeD_rain, gallery:[], links:[]},
+    {id:"t-tube", section:"threed", title:"Product Visualization", year:"", tags:["3D Product"], desc:"Studio-lit fluid/product render study.", cover:IMG.threeD_tube, gallery:[], links:[{label:"Watch Reel", url:"https://www.instagram.com/reel/CuCXsggvq0d/"}]},
+    {id:"t-rain", section:"threed", title:"Rain Mood Piece", year:"", tags:["3D Animation"], desc:"Atmospheric rain scene, lookdev and lighting study.", cover:IMG.threeD_rain, gallery:[], links:[{label:"Watch Reel", url:"https://www.instagram.com/reel/CtYyxe6N3KZ/"}]},
     {id:"t-drift", section:"threed", title:"Night Drift", year:"", tags:["3D Vehicle"], desc:"Car render — lighting and reflection study.", cover:"", gallery:[], links:[]},
     {id:"t-cruise", section:"threed", title:"Golden Hour Cruise", year:"", tags:["3D Vehicle"], desc:"Car render — golden hour lighting study.", cover:"", gallery:[], links:[]},
   ];
@@ -950,7 +946,7 @@ function seedProjects(){
 
 function defaultSettings(){
   return {
-    reelUrl:"https://youtu.be/QwttMcpHpQ",
+    reelUrl:"https://youtu.be/KA9fN0XKe2k",
     reelPoster: IMG.hero_kheefa,
     whatsapp:"https://wa.me/",
     pin:"2580",
@@ -1340,9 +1336,51 @@ function renderThreeD(){
   el.querySelectorAll('.threed-card').forEach(c=>c.addEventListener('click', ()=>openModal(c.dataset.id)));
 }
 
+/* ============ AMBIENT BACKGROUND REEL (muted, looped YouTube video behind the hero) ============ */
+function ytIdFromUrl(url){
+  const m = /(?:youtu\.be\/|[?&]v=|embed\/)([a-zA-Z0-9_-]{6,})/.exec(url || '');
+  return m ? m[1] : '';
+}
+let reelBgId = '';
+function fitReelBg(){
+  const wrap = $('reelBgWrap');
+  const ifr = wrap && wrap.querySelector('iframe');
+  if(!ifr) return;
+  const rect = wrap.getBoundingClientRect();
+  if(!rect.width || !rect.height) return;
+  const videoRatio = 16 / 9;
+  let w, h;
+  if(rect.width / rect.height > videoRatio){ w = rect.width; h = w / videoRatio; }
+  else { h = rect.height; w = h * videoRatio; }
+  /* pad slightly so YouTube's own player never leaves a sub-pixel gap at the edges */
+  ifr.style.width = Math.ceil(w * 1.02) + 'px';
+  ifr.style.height = Math.ceil(h * 1.02) + 'px';
+}
+function mountReelBg(){
+  const id = ytIdFromUrl(SETTINGS.reelUrl);
+  const wrap = $('reelBgWrap'), frame = $('reelFrame');
+  if(!id){ wrap.innerHTML = ''; reelBgId = ''; frame.classList.remove('video-ready'); return; }
+  if(id === reelBgId) return;                 /* same video already mounted, nothing to do */
+  reelBgId = id;
+  frame.classList.remove('video-ready');
+  const f = document.createElement('iframe');
+  f.src = `https://www.youtube.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}&controls=0&modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&fs=0`;
+  f.title = 'Ambient showreel background';
+  f.setAttribute('allow', 'autoplay; encrypted-media');
+  f.addEventListener('load', () => { frame.classList.add('video-ready'); fitReelBg(); });
+  wrap.innerHTML = '';
+  wrap.appendChild(f);
+  fitReelBg();
+}
 function renderReel(){
   $('reelPoster').src = SETTINGS.reelPoster || IMG.hero_kheefa;
+  const id = ytIdFromUrl(SETTINGS.reelUrl);
+  $('reelWatchLink').href = id ? 'https://www.youtube.com/watch?v=' + id : (SETTINGS.reelUrl || '#');
+  /* defer the embed briefly so it never competes with the page's first paint */
+  if('requestIdleCallback' in window) requestIdleCallback(mountReelBg, {timeout: 2500});
+  else setTimeout(mountReelBg, 800);
 }
+window.addEventListener('resize', () => { if($('reelBgWrap').querySelector('iframe')) fitReelBg(); });
 
 /* ---- Instagram reels: lightweight lazy iframes (no embed.js, never a blank section) ---- */
 const embedIO = ('IntersectionObserver' in window) ? new IntersectionObserver((entries) => {
@@ -1484,22 +1522,6 @@ function openModal(id){
 }
 $('modalCloseBtn').addEventListener('click', ()=>{ modalOpenId = null; $('projectModal').classList.remove('show'); });
 $('projectModal').addEventListener('click', (e)=>{ if(e.target.id==='projectModal'){ modalOpenId = null; e.currentTarget.classList.remove('show'); } });
-
-/* ============ FEATURED REEL PLAY ============ */
-$('reelPlayBtn').addEventListener('click', ()=>{
-  const frame = $('reelFrame');
-  const url = SETTINGS.reelUrl || '';
-  const idMatch = url.match(/(?:youtu\.be\/|v=)([a-zA-Z0-9_-]+)/);
-  const vid = idMatch ? idMatch[1] : '';
-  if(!vid){ showToast('No reel URL set yet — add one in Admin → Settings.'); return; }
-  const iframe = document.createElement('iframe');
-  iframe.className = 'reel-frame-iframe';
-  iframe.src = `https://www.youtube.com/embed/${vid}?autoplay=1&rel=0`;
-  iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-  iframe.allowFullscreen = true;
-  frame.innerHTML = '';
-  frame.appendChild(iframe);
-});
 
 /* ============ SCROLL FX (throttled with rAF, no layout reads while scrolling) ============ */
 const header = $('siteHeader');
