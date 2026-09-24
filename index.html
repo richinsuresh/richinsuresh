@@ -42,6 +42,7 @@ button{font-family:inherit;cursor:pointer;background:none;border:none;color:inhe
 img{display:block;max-width:100%;}
 .mono{font-family:'JetBrains Mono',monospace;}
 .display{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:0.01em;}
+@media (prefers-reduced-motion: reduce){ .letterbox, .intro-mark{ animation:none !important; opacity:0 !important; transform:none !important; } }
 
 /* ---------- grain overlay ---------- */
 .grain{
@@ -154,30 +155,17 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 .btn-outline{border:1px solid var(--line-strong);color:var(--paper);}
 .btn-outline:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px);}
 
-/* showreel frame — ambient looping background video */
-.reel-frame{
-  margin-top:64px;position:relative;width:100%;aspect-ratio:16/8.2;border-radius:6px;overflow:hidden;
-  border:1px solid var(--line-strong);background:#000;
+/* hero — ambient looping background video fills the whole top/header area */
+.hero{position:relative;overflow:hidden;}
+.hero-bg-wrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.hero-bg-wrap iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:0;}
+.hero-bg-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.5;transition:opacity 1s ease;z-index:0;}
+.hero.video-ready .hero-bg-poster{opacity:0;}
+.hero-bg-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg, rgba(11,11,13,0.55) 0%, rgba(11,11,13,0.72) 45%, var(--ink) 94%);
 }
-.reel-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85;transition:opacity .8s ease;z-index:1;}
-.reel-frame.video-ready img{opacity:0;}
-.reel-bg-wrap{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
-.reel-bg-wrap iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border:0;}
-.reel-frame::before{
-  content:'';position:absolute;inset:0;z-index:2;
-  background:linear-gradient(180deg, rgba(11,11,13,0.15) 0%, rgba(11,11,13,0.6) 100%);
-}
-.reel-label{position:absolute;top:20px;left:20px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:var(--paper-dim);text-transform:uppercase;}
-.reel-watch{
-  position:absolute;top:18px;right:20px;z-index:3;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.05em;
-  color:var(--paper-dim);text-transform:uppercase;padding:8px 14px;border:1px solid var(--line-strong);border-radius:100px;
-  background:rgba(11,11,13,0.45);transition:all .25s ease;
-}
-.reel-watch:hover{color:var(--teal);border-color:var(--teal);}
-.reel-bars{position:absolute;left:0;right:0;height:9%;background:#000;z-index:2;}
-.reel-bars.t{top:0;}
-.reel-bars.b{bottom:0;}
-.reel-tc{position:absolute;bottom:16px;left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);z-index:3;letter-spacing:0.05em;}
+.hero-top,.hero-tagline,.hero-cta{position:relative;z-index:2;}
 
 /* ---------- about ---------- */
 .about-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:start;}
@@ -456,6 +444,9 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
 <!-- HERO -->
 <section class="hero" id="hero">
+  <div class="hero-bg-wrap" id="reelBgWrap"></div>
+  <img id="reelPoster" class="hero-bg-poster" src="" alt="">
+  <div class="hero-bg-overlay"></div>
   <div class="hero-top reveal-up">
     <h1 class="hero-title"><span id="heroLine1">RICHIN</span><br><span class="line2" id="heroLine2">SURESH</span></h1>
     <div class="hero-role mono">
@@ -468,17 +459,10 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
   <div class="hero-cta reveal-up">
     <a href="#work" class="btn btn-solid">View Work</a>
     <a href="#contact" class="btn btn-outline">Get in Touch ↗</a>
+    <a href="#" id="reelWatchLink" class="btn btn-outline" target="_blank" rel="noopener">Watch with Sound ↗</a>
   </div>
 
-  <div class="reel-frame reveal-up" id="reelFrame">
-    <div class="reel-bars t"></div>
-    <div class="reel-bars b"></div>
-    <img id="reelPoster" src="" alt="Showreel background">
-    <div class="reel-bg-wrap" id="reelBgWrap"></div>
-    <span class="reel-label mono">Ambient Showreel</span>
-    <a class="reel-watch mono" id="reelWatchLink" href="#" target="_blank" rel="noopener">Watch with sound ↗</a>
-    <span class="reel-tc mono">A_ROLL_01.MOV — 3840×2160</span>
-  </div>
+  
 </section>
 
 <!-- ABOUT -->
@@ -730,7 +714,7 @@ section{position:relative;padding:140px 32px;max-width:1360px;margin:0 auto;}
 
         <p class="eyebrow" style="margin:28px 0 14px;">Featured Reel &amp; Contact</p>
         <div class="form-grid">
-          <div class="form-field full"><label>Ambient Background Video — YouTube URL</label><input type="text" id="sReelUrl" placeholder="https://youtu.be/..."><p style="color:var(--paper-dim);font-size:11px;margin-top:6px;">Plays muted and looped behind the hero. Visitors can click “Watch with sound” to open it on YouTube.</p></div>
+          <div class="form-field full"><label>Ambient Background Video — YouTube URL</label><input type="text" id="sReelUrl" placeholder="https://youtu.be/..."><p style="color:var(--paper-dim);font-size:11px;margin-top:6px;">Plays muted and looped as the background of the top/header area. Visitors can click “Watch with Sound” to open it on YouTube.</p></div>
           <div class="form-field full"><label>Featured Reel — Poster Image</label>
             <label class="upload-box"><input type="file" accept="image/*" id="sReelPosterInput"><span>Click to upload a poster frame</span></label>
             <img id="reelPosterPreview" class="upload-preview" style="display:none;">
@@ -1250,6 +1234,21 @@ async function init(){
   }
   firstPaint();
 }
+/* ---- Intro safety net: the letterbox bars + name flash are pure CSS animations, which can get
+   stuck (frozen mid-animation) if the browser throttles a backgrounded tab, or never run at all
+   under prefers-reduced-motion. This guarantees they always end, regardless. ---- */
+function killIntro(){
+  const lt = $('lbTop'), lb = $('lbBottom'), im = document.querySelector('.intro-mark');
+  if(lt) lt.style.transform = 'translateY(-100%)';
+  if(lb) lb.style.transform = 'translateY(100%)';
+  if(im) im.style.display = 'none';
+}
+const INTRO_KILL_AT = Date.now() + 2200;
+setTimeout(killIntro, 2200);
+document.addEventListener('visibilitychange', () => {
+  if(!document.hidden && Date.now() >= INTRO_KILL_AT) killIntro();
+});
+
 function firstPaint(){
   sortProjects();
   renderAll();
@@ -1358,7 +1357,7 @@ function fitReelBg(){
 }
 function mountReelBg(){
   const id = ytIdFromUrl(SETTINGS.reelUrl);
-  const wrap = $('reelBgWrap'), frame = $('reelFrame');
+  const wrap = $('reelBgWrap'), frame = $('hero');
   if(!id){ wrap.innerHTML = ''; reelBgId = ''; frame.classList.remove('video-ready'); return; }
   if(id === reelBgId) return;                 /* same video already mounted, nothing to do */
   reelBgId = id;
