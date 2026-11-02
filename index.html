@@ -1082,7 +1082,10 @@ function allPosts(){
     (b.pinned?1:0)-(a.pinned?1:0) || String(b.date||'').localeCompare(String(a.date||'')) ||
     (a.order==null?1e9:a.order)-(b.order==null?1e9:b.order));
 }
-function livePosts(){ return allPosts().filter(p=>!p.hidden); }
+/* the public site shows projects in a fresh random order on every visit (stable while the page stays open) */
+const RAND = new Map();
+const rk = id=>{ if(!RAND.has(id)) RAND.set(id, Math.random()); return RAND.get(id); };
+function livePosts(){ return allPosts().filter(p=>!p.hidden).sort((a,b)=>rk(a.id)-rk(b.id)); }
 function hasVideo(p){ return (p.media||[]).some(m=>m.type==='video'); }
 function clampRatio(r){ return Math.min(2.4, Math.max(0.5, r || 1.7778)); }
 function fmtDur(sec){ sec=Math.round(sec||0); if(!sec) return ''; const m=Math.floor(sec/60), s=sec%60; return m+':'+String(s).padStart(2,'0'); }
@@ -1116,7 +1119,7 @@ function nwDuration(p){ const v=(p.media||[]).find(m=>m.type==='video' && m.dur)
 
 /* departments: derived from tags on posts, in the order you set (newest first otherwise) */
 function categoryNames(includeDrafts){
-  const src = includeDrafts ? allPosts() : livePosts();
+  const src = includeDrafts ? allPosts() : allPosts().filter(p=>!p.hidden);
   const found = []; src.forEach(p=>{ const c=(p.category||'').trim(); if(c && !found.includes(c)) found.push(c); });
   const ordered = (SETTINGS.categoryOrder||[]).filter(c=>found.includes(c));
   return ordered.concat(found.filter(c=>!ordered.includes(c)));
