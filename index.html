@@ -540,6 +540,9 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
 .tile.sk{background:linear-gradient(100deg,var(--panel) 30%,var(--lift) 50%,var(--panel) 70%);background-size:300% 100%;animation:shim 1.2s linear infinite;pointer-events:none;}
 @keyframes shim{to{background-position:-300% 0;}}
 
+.setup-banner{border:1px solid var(--amber);background:rgba(255,178,30,.08);border-radius:6px;padding:16px 18px;margin-bottom:18px;font-size:14px;line-height:1.6;}
+.setup-banner ol{margin:10px 0 8px 20px;display:grid;gap:8px;}
+
 </style>
 </head>
 <body>
@@ -650,6 +653,7 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
 
       <!-- POSTS: one composer for everything -->
       <div id="tabPosts">
+        <div class="setup-banner" id="setupBanner" style="display:none;"></div>
         <div class="composer" id="pbBox">
           <div class="pb-mode mono" id="pbMode">New post</div>
           <input class="pb-title" id="pbTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off">
@@ -666,7 +670,8 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
           </label>
           <div id="pbUploads"></div>
           <div class="pb-tiles" id="pbMedia"></div>
-          <div class="pb-link"><input type="text" id="pbUrl" placeholder="Or paste a YouTube, Vimeo or Instagram link"><button class="btn btn-outline" id="pbUrlAdd">Add link</button></div>
+          <div id="pbLinks" class="chips" style="margin-top:12px;"></div>
+          <div class="pb-link"><input type="text" id="pbUrl" placeholder="Paste any link: YouTube, Vimeo, Instagram, a photo or a video file"><button class="btn btn-outline" id="pbUrlAdd">Add link</button></div>
           <div class="pb-foot">
             <label class="check-row"><input type="checkbox" id="pbPinned"> Pin to top</label>
             <label class="check-row"><input type="checkbox" id="pbHidden"> Save as draft</label>
@@ -726,15 +731,14 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
         <div id="authBox" style="font-size:13px;color:var(--dim);margin-bottom:12px;"></div>
         <div class="form-grid" style="max-width:420px;"><div class="form-field"><label>Change PIN</label><input type="text" id="sPin" placeholder="New PIN"></div></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-          <button class="btn btn-outline btn-sm" id="copySqlSetup">Copy storage setup SQL</button>
-          <button class="btn btn-outline btn-sm" id="copySqlOpen">Copy PIN-access SQL</button>
-          <button class="btn btn-outline btn-sm" id="copySqlSecure">Copy hardening SQL</button>
+          <button class="btn btn-outline btn-sm" id="copySqlSetup">Copy setup SQL</button>
+                    <button class="btn btn-outline btn-sm" id="copySqlSecure">Copy hardening SQL</button>
           <button class="btn btn-solid btn-sm" id="checkStorage">Check storage</button>
           <button class="btn btn-outline btn-sm" id="speedUp">Speed up loading</button>
         </div>
         <p class="hint" id="speedUpOut" style="max-width:640px;"></p>
         <p class="hint" id="checkStorageOut" style="max-width:640px;min-height:16px;"></p>
-        <p class="hint" style="max-width:640px;">Two ways to run this. <b>PIN mode</b>: run the PIN-access SQL, and the PIN can save and upload. Simple, but anyone who reads the site code could write to your database. <b>Account mode</b>: create a user in Supabase under Authentication, run the hardening SQL, then use account login. Safer. Only run one of the two.</p>
+        <p class="hint" style="max-width:640px;">The setup SQL lets the PIN save and upload. For stricter security, make a user in Supabase under Authentication, run the hardening SQL, then use account login. Run only one of the two.</p>
 
         <hr style="border:none;border-top:1px solid var(--line);margin:26px 0;">
         <p class="eyebrow">Export</p>
@@ -990,7 +994,7 @@ function parseVideo(url){
   url = (url||'').trim(); let m;
   if((m=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtube-nocookie\.com\/embed\/)([\w-]{6,})/))) return {kind:'youtube', id:m[1]};
   if((m=url.match(/vimeo\.com\/(?:video\/)?(\d+)/))) return {kind:'vimeo', id:m[1]};
-  if(/instagram\.com\/(reel|reels|p|tv)\//.test(url)) return {kind:'instagram'};
+  if(/instagram\.com\/(?:[^\/?#]+\/)?(reel|reels|p|tv)\//.test(url)) return {kind:'instagram'};
   if(/^(https?:|blob:|data:video)/.test(url)) return {kind:'file'};
   return null;
 }
@@ -1441,7 +1445,7 @@ async function sbUploadXHR(path, blob, onProg){
       let msg = 'Upload failed ('+xhr.status+')';
       try{ const j = JSON.parse(xhr.responseText); msg = j.message || j.error || msg; }catch(e){}
       if(/bucket/i.test(msg) && /not found/i.test(msg)) msg = 'The storage bucket is missing. Run the setup SQL (Site tab).';
-      if(xhr.status===401 || xhr.status===403 || /row-level security|policy|unauthorized|not allowed/i.test(msg)) msg = 'Supabase blocked this upload. Open the Site tab and press Check storage for the fix.';
+      if(xhr.status===401 || xhr.status===403 || /row-level security|policy|unauthorized|not allowed/i.test(msg)) msg = 'Blocked by Supabase. Follow the setup box at the top of this panel.';
       reject(new Error(msg));
     };
     xhr.onerror = ()=>reject(new Error('Network error during upload'));
@@ -1543,7 +1547,23 @@ function openAdminPanel(){
   persistMigration().then(()=>{ if(usingSupabase() && hasInlineImages() && !window.__offloading){ window.__offloading = true;
     offloadImages().then(r=>{ if(r.n){ showToast('Images moved to storage. The site will load faster.'); renderSite(); } }).catch(e=>console.warn('offload', e)).finally(()=>{ window.__offloading = false; }); } });
   showAdminTab('posts'); if(!nwDraft) pbStart();
-  adminRefresh(); paintAuthBox();
+  adminRefresh(); paintAuthBox(); paintSetupBanner();
+}
+async function storageProbe(){
+  if(!usingSupabase()) return {ok:true, skipped:true};
+  try{ const url = await sbUploadXHR('_check/'+Date.now()+'.txt', new Blob(['ok'],{type:'text/plain'})); removeFromStorage([url]); return {ok:true}; }
+  catch(e){ return {ok:false, msg:e.message}; }
+}
+async function paintSetupBanner(){
+  const el = $('setupBanner'); const r = await storageProbe();
+  if(r.ok){ el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = `<b>Uploads are blocked by Supabase.</b> This is a one-time setup, about a minute.
+    <ol><li><button class="btn btn-solid btn-sm" id="bnCopy">Copy setup SQL</button></li>
+    <li>In Supabase, open <b>SQL Editor</b>, paste, press <b>Run</b>.</li>
+    <li><button class="btn btn-outline btn-sm" id="bnCheck">Check again</button> <span id="bnOut" class="hint"></span></li></ol>`;
+  $('bnCopy').addEventListener('click', ()=>copyText(SQL_OPEN, 'Setup SQL copied'));
+  $('bnCheck').addEventListener('click', async ()=>{ $('bnOut').textContent='Checking…'; const x = await storageProbe(); if(x.ok){ paintSetupBanner(); showToast('Uploads work now'); } else $('bnOut').textContent = 'Still blocked. Run the SQL, then check again.'; });
 }
 function adminRefresh(){ renderPostList(); renderChips(); renderCatList(); fillSiteForm(); }
 $('adminCloseBtn').addEventListener('click', ()=>panelBackdrop.classList.remove('show'));
@@ -1596,9 +1616,15 @@ function renderChips(){
 }
 $('pbNewCat').addEventListener('input', ()=>{ nwDraft.category = $('pbNewCat').value.trim(); renderChips(); });
 function nwAutoCover(){ if(!nwDraft.cover){ const x = nwPoster(nwDraft); if(x) nwDraft.cover = x; } }
+function pbRenderLinks(){
+  const d = nwDraft, el = $('pbLinks'); d.links = d.links || [];
+  el.innerHTML = d.links.map((l,i)=>`<span class="chip on" style="display:inline-flex;gap:8px;align-items:center;">${esc(l.label||l.url)}<button data-lrm="${i}" aria-label="Remove link" style="color:#141414;">✕</button></span>`).join('');
+  el.querySelectorAll('[data-lrm]').forEach(b=>b.addEventListener('click', ()=>{ d.links.splice(+b.dataset.lrm,1); pbRenderLinks(); }));
+}
 function pbRenderMedia(){
-  const d = nwDraft, el = $('pbMedia');
-  if(!d.media.length){ el.innerHTML = ''; return; }
+  pbRenderLinks();
+  const d = nwDraft, el = $('pbMedia'); d.links = d.links || [];
+  const linkTiles = d.links.map((l,i)=>`<div class="pb-tile"><div class="pb-thumb"><span>🔗</span><span class="pb-kind mono">Link</span><button class="pb-x" data-lrm="${i}" title="Remove" aria-label="Remove">✕</button></div><input type="text" value="${esc(l.label)}" data-llab="${i}" placeholder="Button text" aria-label="Button text"></div>`).join('');
   el.innerHTML = d.media.map((m,i)=>{
     const p = posterOf(m), v = parseVideo(m.src)||{};
     const label = m.type==='image' ? 'Photo' : (v.kind==='file' ? 'Video' : (v.kind||'Link'));
@@ -1610,7 +1636,9 @@ function pbRenderMedia(){
       </div>
       <input type="text" placeholder="Caption" value="${esc(m.caption||'')}" data-cap="${i}">
     </div>`;
-  }).join('');
+  }).join('') + linkTiles;
+  el.querySelectorAll('[data-llab]').forEach(inp=>inp.addEventListener('input', ()=>{ d.links[+inp.dataset.llab].label = inp.value; }));
+  el.querySelectorAll('[data-lrm]').forEach(b=>b.addEventListener('click', ()=>{ d.links.splice(+b.dataset.lrm,1); pbRenderMedia(); }));
   el.querySelectorAll('[data-cap]').forEach(inp=>inp.addEventListener('input', ()=>{ d.media[+inp.dataset.cap].caption = inp.value; }));
   el.querySelectorAll('[data-cov]').forEach(b=>b.addEventListener('click', ()=>{ const x = posterOf(d.media[+b.dataset.cov]); if(x){ d.cover = x; pbRenderMedia(); } else showToast('This item has no still image to use as the cover.'); }));
   el.querySelectorAll('[data-mup]').forEach(b=>b.addEventListener('click', ()=>{ const i=+b.dataset.mup; if(i>0){ [d.media[i-1],d.media[i]]=[d.media[i],d.media[i-1]]; pbRenderMedia(); } }));
@@ -1652,9 +1680,15 @@ async function nwAddFiles(files){
   }
 }
 function nwAddUrl(){
-  const url = $('pbUrl').value.trim(); if(!url) return;
-  const v = parseVideo(url); if(!v){ showToast('Paste a full link that starts with https://'); return; }
-  nwDraft.media.push({id:'m-'+Date.now(), type:(v.kind==='file' && isImageUrl(url))?'image':'video', kind:v.kind, src:url, poster:'', caption:''});
+  let url = $('pbUrl').value.trim(); if(!url) return;
+  if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(url)) url = 'https://' + url.replace(/^\/+/, '');
+  let host = ''; try{ host = new URL(url).hostname.replace(/^www\./,''); }catch(e){}
+  if(/\s/.test(url) || !/^[\w-]+(\.[\w-]+)+$/.test(host)){ showToast('That does not look like a link. Check it and try again.'); return; }
+  const v = parseVideo(url), d = nwDraft, id = 'm-'+Date.now();
+  if(v && v.kind!=='file') d.media.push({id, type:'video', kind:v.kind, src:url, poster:'', caption:''});
+  else if(isImageUrl(url)) d.media.push({id, type:'image', kind:'file', src:url, caption:''});
+  else if(/\.(mp4|webm|mov|m4v|ogv)(\?|#|$)/i.test(url)) d.media.push({id, type:'video', kind:'file', src:url, poster:'', caption:''});
+  else d.links.push({label: host, url});          /* any other link becomes a button on the post page */
   $('pbUrl').value = ''; nwAutoCover(); pbRenderMedia();
 }
 async function pbPublish(){
@@ -1665,12 +1699,12 @@ async function pbPublish(){
   const exists = PROJECTS.some(p=>p.id===d.id);
   if(!d.title){ showToast('Add a title first'); $('pbTitle').focus(); return; }
   if(!d.category){ showToast('Pick a department or type a new one'); return; }
-  if(!d.media.length && !exists){ showToast('Add at least one photo or video'); return; }
+  if(!d.media.length && !(d.links||[]).length && !exists){ showToast('Add a photo, video or link first'); return; }
   if(!d.date) d.date = new Date().toISOString();
   nwAutoCover();
   const st = nwStage(d); d.duration = (st && st.dur) ? fmtDur(st.dur) : '';
   PROJECTS = exists ? PROJECTS.map(p=>p.id===d.id ? d : p) : PROJECTS.concat(d);
-  try{ await savePost(d); }catch(e){ console.error(e); }
+  try{ await savePost(d); }catch(e){ console.error(e); window.__saveFail && window.__saveFail(e); }
   const keep = new Set(nwUrlsOf(d));
   removeFromStorage(nwOrigUrls.filter(u=>!keep.has(u)).concat(nwSessionUploads.filter(u=>!keep.has(u))));
   showToast(d.hidden ? 'Draft saved' : (exists ? 'Changes saved' : 'Published'));
@@ -1802,8 +1836,7 @@ $('checkStorage').addEventListener('click', async ()=>{
       : 'You are only unlocked with the PIN. Your Supabase has the <b>hardening SQL</b> switched on, which blocks the PIN. Pick one: (1) lock the admin, choose <b>Use account login instead</b> and sign in with the user you made in Supabase, or (2) press <b>Copy PIN-access SQL</b>, run it in Supabase SQL Editor, and the PIN works again.');
   }
 });
-$('copySqlSetup').addEventListener('click', ()=>copyText(SQL_SETUP, 'Setup SQL copied. Paste it in Supabase, SQL Editor.'));
-$('copySqlOpen').addEventListener('click', ()=>copyText(SQL_OPEN, 'PIN-access SQL copied. Run it in Supabase, SQL Editor.'));
+$('copySqlSetup').addEventListener('click', ()=>copyText(SQL_OPEN, 'Setup SQL copied. Paste it in Supabase, SQL Editor.'));
 $('copySqlSecure').addEventListener('click', ()=>copyText(SQL_SECURE, 'Hardening SQL copied'));
 
 const SQL_SETUP = `-- Run once in Supabase → SQL Editor. Creates the media bucket for videos & photos.
@@ -1844,7 +1877,9 @@ create policy "portfolio media update" on storage.objects for update to authenti
 create policy "portfolio media delete" on storage.objects for delete to authenticated using (bucket_id = 'portfolio-media');`;
 
 
-const SQL_OPEN = `-- PIN mode: lets the site save and upload with the PIN login. Run this if you ran the hardening SQL and want the PIN to work again.
+const SQL_OPEN = `-- ONE-TIME SETUP for your portfolio. Paste all of this in Supabase, SQL Editor, then press Run. Safe to run again.
+create table if not exists public.projects (id text primary key, data jsonb not null);
+create table if not exists public.settings (id text primary key, data jsonb not null);
 do $$ declare r record; begin
   for r in select policyname, tablename from pg_policies where schemaname='public' and tablename in ('projects','settings') loop
     execute format('drop policy %I on public.%I', r.policyname, r.tablename);
@@ -1869,7 +1904,7 @@ create policy "portfolio media insert" on storage.objects for insert with check 
 create policy "portfolio media update" on storage.objects for update using (bucket_id = 'portfolio-media');
 create policy "portfolio media delete" on storage.objects for delete using (bucket_id = 'portfolio-media');`;
 let saveWarned = 0;
-window.__saveFail = ()=>{ if(Date.now()-saveWarned < 8000) return; saveWarned = Date.now(); showToast('Supabase refused to save. Sign in with account login, or run the PIN-access SQL (Site tab).'); };
+window.__saveFail = ()=>{ if(Date.now()-saveWarned < 8000) return; saveWarned = Date.now(); showToast('Supabase refused to save. Run the one-time setup SQL shown at the top of the admin panel.'); paintSetupBanner(); };
 
 /* ---------- PDF export ---------- */
 async function exportPortfolioPDF(){
