@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Richin Suresh, Digital Creator</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://ooyukxkzyscctgddqcfh.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
@@ -537,6 +537,9 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
 @media (max-width:860px){.grid{column-count:2;} #work{padding:6px 4px 0;} .grid{column-gap:4px;} .grid>.tile{margin-bottom:4px;} .hero{padding-top:76px;} .ruler{top:52px;}}
 @media (prefers-reduced-motion:reduce){.grid>.tile{animation:none;}}
 
+.tile.sk{background:linear-gradient(100deg,var(--panel) 30%,var(--lift) 50%,var(--panel) 70%);background-size:300% 100%;animation:shim 1.2s linear infinite;pointer-events:none;}
+@keyframes shim{to{background-position:-300% 0;}}
+
 </style>
 </head>
 <body>
@@ -724,11 +727,14 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
         <div class="form-grid" style="max-width:420px;"><div class="form-field"><label>Change PIN</label><input type="text" id="sPin" placeholder="New PIN"></div></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
           <button class="btn btn-outline btn-sm" id="copySqlSetup">Copy storage setup SQL</button>
+          <button class="btn btn-outline btn-sm" id="copySqlOpen">Copy PIN-access SQL</button>
           <button class="btn btn-outline btn-sm" id="copySqlSecure">Copy hardening SQL</button>
           <button class="btn btn-solid btn-sm" id="checkStorage">Check storage</button>
+          <button class="btn btn-outline btn-sm" id="speedUp">Speed up loading</button>
         </div>
+        <p class="hint" id="speedUpOut" style="max-width:640px;"></p>
         <p class="hint" id="checkStorageOut" style="max-width:640px;min-height:16px;"></p>
-        <p class="hint" style="max-width:640px;">The PIN only hides this screen and is stored in a public row, so it is not real security. For real protection, create a user in Supabase under Authentication, run the hardening SQL, then sign in with account login.</p>
+        <p class="hint" style="max-width:640px;">Two ways to run this. <b>PIN mode</b>: run the PIN-access SQL, and the PIN can save and upload. Simple, but anyone who reads the site code could write to your database. <b>Account mode</b>: create a user in Supabase under Authentication, run the hardening SQL, then use account login. Safer. Only run one of the two.</p>
 
         <hr style="border:none;border-top:1px solid var(--line);margin:26px 0;">
         <p class="eyebrow">Export</p>
@@ -826,11 +832,11 @@ async function sbGetProjects(){
 }
 async function sbUpsertProject(project){
   const {error} = await sb.from('projects').upsert({id:project.id, data:project});
-  if(error) console.error(error);
+  if(error){ console.error(error); window.__saveFail && window.__saveFail(error); }
 }
 async function sbDeleteProject(id){
   const {error} = await sb.from('projects').delete().eq('id', id);
-  if(error) console.error(error);
+  if(error){ console.error(error); window.__saveFail && window.__saveFail(error); }
 }
 async function sbGetSettings(){
   const {data, error} = await sb.from('settings').select('data').eq('id','main').maybeSingle();
@@ -839,7 +845,7 @@ async function sbGetSettings(){
 }
 async function sbSetSettings(settings){
   const {error} = await sb.from('settings').upsert({id:'main', data:settings});
-  if(error) console.error(error);
+  if(error){ console.error(error); window.__saveFail && window.__saveFail(error); }
 }
 
 /* ---- tier 2: Claude artifact shared storage (works only inside Claude.ai) ---- */
@@ -1021,14 +1027,30 @@ function categories(){
 /* =====================================================================
    INIT + PERSISTENCE
    ===================================================================== */
+/* tiny IndexedDB cache: the last good copy paints the page instantly while fresh data loads */
+function idb(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('pf-cache',1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){ rej(e); } }); }
+async function idbGet(k){ try{ const d=await idb(); return await new Promise(res=>{ const q=d.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(null); }); }catch(e){ return null; } }
+async function idbSet(k,v){ try{ const d=await idb(); d.transaction('kv','readwrite').objectStore('kv').put(v,k); }catch(e){} }
+let cacheT = 0;
+function saveCache(){ if(!usingSupabase()) return; clearTimeout(cacheT); cacheT = setTimeout(()=>idbSet('cache',{projects:PROJECTS, settings:SETTINGS}), 600); }
+function skeleton(){ $('grid').innerHTML = Array.from({length:8},(_,i)=>`<div class="tile sk" style="--r:${[1.7778,0.5625,1.3333,1,1.7778,1.7778,0.75,1.3333][i]}"></div>`).join(''); }
+const orderOf = ()=>Object.fromEntries(seedProjects().map((p,i)=>[p.id,i]));
+function prepare(raw){ const order = orderOf(); return raw.map((p,i)=>migrateLegacy(p, order[p.id]!=null ? order[p.id] : 100+i)); }
+
 async function init(){
-  let raw;
+  let raw, painted = null;
   if(usingSupabase()){
-    raw = await sbGetProjects();
-    if(!raw || !raw.length){ raw = seedPosts(); for(const p of raw) await sbUpsertProject(p); MIGRATED = []; }
-    let s = await sbGetSettings();
-    if(!s){ s = defaultSettings(); await sbSetSettings(s); }
-    SETTINGS = {...defaultSettings(), ...s};
+    /* paint the cached copy right away, fetch everything in parallel */
+    const cachedP = idbGet('cache');
+    const netP = Promise.all([sbGetProjects(), sbGetSettings()]);
+    const c = await Promise.race([cachedP, netP.then(()=>null)]);
+    if(c && c.projects){ PROJECTS = c.projects; SETTINGS = {...defaultSettings(), ...c.settings}; painted = JSON.stringify([c.projects, c.settings]); renderSite(); }
+    else skeleton();
+    let [rp, rs] = await netP;
+    raw = rp;
+    if(!raw || !raw.length){ raw = seedPosts(); await Promise.all(raw.map(p=>sbUpsertProject(p))); MIGRATED = []; }
+    if(!rs){ rs = defaultSettings(); await sbSetSettings(rs); }
+    SETTINGS = {...defaultSettings(), ...rs};
   } else if(hasClaudeStorage()){
     raw = await storeGet('portfolio:projects', true);
     if(!raw){ raw = seedPosts(); await storeSet('portfolio:projects', raw, true); MIGRATED = []; }
@@ -1038,9 +1060,10 @@ async function init(){
   } else {
     raw = seedPosts(); MIGRATED = []; SETTINGS = defaultSettings();
   }
-  const order = Object.fromEntries(seedProjects().map((p,i)=>[p.id,i]));
-  PROJECTS = raw.map((p,i)=>migrateLegacy(p, order[p.id]!=null ? order[p.id] : 100+i));
-  renderSite();
+  PROJECTS = prepare(raw);
+  /* skip the repaint when nothing changed, so playing clips are not interrupted */
+  if(painted !== JSON.stringify([PROJECTS, SETTINGS])) renderSite(); else saveCache();
+  if(painted === null || painted !== JSON.stringify([PROJECTS, SETTINGS])) saveCache();
 }
 async function persistProjects(){ if(usingSupabase()) return; if(hasClaudeStorage()) await storeSet('portfolio:projects', PROJECTS, true); }
 async function persistSettings(){
@@ -1052,6 +1075,30 @@ async function persistMigration(){
   if(!MIGRATED.length) return;
   const list = MIGRATED.slice(); MIGRATED = [];
   if(usingSupabase()) for(const p of list) await sbUpsertProject(p); else await persistProjects();
+}
+/* Old portfolio images live inside the database rows as huge base64 text. Move them to storage so every load is small and cacheable. */
+const isData = u=>typeof u==='string' && u.startsWith('data:image');
+function hasInlineImages(){ return PROJECTS.some(p=>isData(p.cover) || (p.media||[]).some(m=>isData(m.src)||isData(m.poster))) || isData(SETTINGS.reelPoster); }
+async function offloadImages(onProg){
+  if(!usingSupabase()) return {n:0};
+  const seen = new Map(); let n = 0, total = 0;
+  const count = u=>{ if(isData(u) && !seen.has(u)){ seen.set(u,null); total++; } };
+  PROJECTS.forEach(p=>{ count(p.cover); (p.media||[]).forEach(m=>{ count(m.src); count(m.poster); }); }); count(SETTINGS.reelPoster);
+  seen.clear();
+  const up = async (u,id)=>{
+    if(!isData(u)) return u; if(seen.has(u)) return seen.get(u);
+    const blob = await (await fetch(u)).blob();
+    const url = await uploadBlob(blob, 'legacy/'+id, 'img.'+(/png/.test(blob.type)?'png':'jpg'));
+    seen.set(u,url); n++; if(onProg) onProg(n,total); return url;
+  };
+  for(const p of PROJECTS){
+    if(!(isData(p.cover) || (p.media||[]).some(m=>isData(m.src)||isData(m.poster)))) continue;
+    p.cover = await up(p.cover,p.id);
+    for(const m of (p.media||[])){ m.src = await up(m.src,p.id); if(m.poster) m.poster = await up(m.poster,p.id); }
+    await savePost(p);
+  }
+  if(isData(SETTINGS.reelPoster)){ SETTINGS.reelPoster = await up(SETTINGS.reelPoster,'reel'); await persistSettings(); }
+  return {n};
 }
 async function savePost(p){ if(usingSupabase()) await sbUpsertProject(p); else await persistProjects(); }
 
@@ -1178,7 +1225,7 @@ function renderSite(){
   if(!REDUCED && 'IntersectionObserver' in window){
     tileIO = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) tilePlay(e.target); else tileStop(e.target); }), {threshold:[0,.2],rootMargin:'80px 0px'});
   }
-  renderHeroText(); renderFilters(); renderGrid();
+  renderHeroText(); renderFilters(); renderGrid(); saveCache();
   if($('adminPanelBackdrop').classList.contains('show')) adminRefresh();
   onScroll();
 }
@@ -1464,8 +1511,10 @@ $('adminOpenBtn').addEventListener('click', ()=>{
 });
 $('adminCancelBtn').addEventListener('click', ()=>loginBackdrop.classList.remove('show'));
 loginBackdrop.addEventListener('click', e=>{ if(e.target===loginBackdrop) loginBackdrop.classList.remove('show'); });
+const UNLOCK_KEY = 'pf:unlock', UNLOCK_MS = 12*3600*1000;
+try{ const t = +localStorage.getItem(UNLOCK_KEY); if(t && Date.now()-t < UNLOCK_MS) window.__adminSession = true; }catch(e){}
 function tryLogin(){
-  if($('adminPinInput').value === (SETTINGS.pin || '2580')){ loginBackdrop.classList.remove('show'); openAdminPanel(); }
+  if($('adminPinInput').value === (SETTINGS.pin || '2580')){ try{ localStorage.setItem(UNLOCK_KEY, String(Date.now())); }catch(e){} window.__adminSession = true; loginBackdrop.classList.remove('show'); openAdminPanel(); }
   else $('adminErr').textContent = 'Wrong PIN. Try again.';
 }
 $('adminSubmitBtn').addEventListener('click', tryLogin);
@@ -1491,7 +1540,8 @@ $('acctPass').addEventListener('keydown', e=>{ if(e.key==='Enter') acctLogin(); 
 
 function openAdminPanel(){
   panelBackdrop.classList.add('show'); adminUnlocked = true;
-  persistMigration();
+  persistMigration().then(()=>{ if(usingSupabase() && hasInlineImages() && !window.__offloading){ window.__offloading = true;
+    offloadImages().then(r=>{ if(r.n){ showToast('Images moved to storage. The site will load faster.'); renderSite(); } }).catch(e=>console.warn('offload', e)).finally(()=>{ window.__offloading = false; }); } });
   showAdminTab('posts'); if(!nwDraft) pbStart();
   adminRefresh(); paintAuthBox();
 }
@@ -1509,8 +1559,8 @@ async function paintAuthBox(){
   if(usingSupabase()){ try{ const {data} = await sb.auth.getSession(); if(data && data.session){ email = data.session.user.email; window.__adminSession = true; } }catch(e){} }
   box.innerHTML = !usingSupabase()
     ? `Account login and video uploads need Supabase. Copy the setup SQL below and run it in your Supabase project.`
-    : (email ? `Signed in as <b>${esc(email)}</b> <button class="btn btn-outline btn-sm" id="signOutBtn" style="margin-left:10px;">Sign out</button>` : `Signed in with the PIN. Use account login on the lock screen for secure saving.`);
-  const so = $('signOutBtn'); if(so) so.addEventListener('click', async ()=>{ await sb.auth.signOut(); window.__adminSession = false; panelBackdrop.classList.remove('show'); showToast('Signed out'); });
+    : (email ? `Signed in as <b>${esc(email)}</b> <button class="btn btn-outline btn-sm" id="signOutBtn" style="margin-left:10px;">Sign out</button>` : `Unlocked with the PIN on this device. <button class="btn btn-outline btn-sm" id="signOutBtn" style="margin-left:10px;">Lock admin</button>`);
+  const so = $('signOutBtn'); if(so) so.addEventListener('click', async ()=>{ if(usingSupabase()) await sb.auth.signOut(); window.__adminSession = false; try{ localStorage.removeItem(UNLOCK_KEY); }catch(e){} panelBackdrop.classList.remove('show'); showToast('Signed out'); });
   const st = $('backendStatus');
   st.style.borderColor = usingSupabase() ? 'var(--amber)' : 'var(--line2)'; st.style.color = usingSupabase() ? 'var(--amber)' : 'var(--dim)';
   st.textContent = usingSupabase() ? 'Connected to Supabase. Changes save permanently.' : (hasClaudeStorage() ? 'Using Claude storage. This will not save once hosted elsewhere.' : 'No backend connected. Changes are lost on refresh.');
@@ -1730,6 +1780,14 @@ $('resetDataBtn').addEventListener('click', async ()=>{
   pbStart(); renderSite(); showToast('Reset to the starter portfolio');
 });
 async function copyText(t, msg){ try{ await navigator.clipboard.writeText(t); showToast(msg); }catch(e){ showToast('Copy failed. Open portfolio-setup.sql instead.'); } }
+$('speedUp').addEventListener('click', async ()=>{
+  const out = $('speedUpOut');
+  if(!usingSupabase()){ out.textContent = 'Needs Supabase.'; return; }
+  if(!hasInlineImages()){ out.textContent = 'Already optimized. Nothing to move.'; return; }
+  out.textContent = 'Moving images…';
+  try{ const r = await offloadImages((n,t)=>{ out.textContent = 'Moving images, '+n+' of '+t; }); out.textContent = 'Done. '+r.n+' images moved. Reload the site to feel the difference.'; renderSite(); }
+  catch(e){ out.textContent = 'Stopped: '+e.message+' Press Check storage first.'; }
+});
 $('checkStorage').addEventListener('click', async ()=>{
   const out = $('checkStorageOut');
   if(!usingSupabase()){ out.textContent = 'Supabase is not connected, so there is no storage to check.'; return; }
@@ -1738,13 +1796,14 @@ $('checkStorage').addEventListener('click', async ()=>{
     const url = await sbUploadXHR('_check/' + Date.now() + '.txt', new Blob(['ok'],{type:'text/plain'}));
     removeFromStorage([url]); out.textContent = 'Storage works. Uploads are allowed.';
   }catch(e){
-    const signed = !!window.__adminSession;
-    out.innerHTML = 'Upload refused: ' + esc(e.message) + '<br>Fix: ' + (signed
-      ? 'you are signed in with an account, so run the hardening SQL (Copy hardening SQL), which allows signed-in users to upload.'
-      : 'in Supabase open SQL Editor, paste the storage setup SQL (Copy storage setup SQL above) and press Run. If you already ran the hardening SQL, sign out and use account login, because the PIN can no longer upload.');
+    let signedIn = false; try{ const {data} = await sb.auth.getSession(); signedIn = !!(data && data.session); }catch(_){}
+    out.innerHTML = 'Upload refused: ' + esc(e.message) + '<br>' + (signedIn
+      ? 'You are signed in with an account, but Supabase still said no. Run the <b>hardening SQL</b> (it lets signed-in users upload), then try again.'
+      : 'You are only unlocked with the PIN. Your Supabase has the <b>hardening SQL</b> switched on, which blocks the PIN. Pick one: (1) lock the admin, choose <b>Use account login instead</b> and sign in with the user you made in Supabase, or (2) press <b>Copy PIN-access SQL</b>, run it in Supabase SQL Editor, and the PIN works again.');
   }
 });
 $('copySqlSetup').addEventListener('click', ()=>copyText(SQL_SETUP, 'Setup SQL copied. Paste it in Supabase, SQL Editor.'));
+$('copySqlOpen').addEventListener('click', ()=>copyText(SQL_OPEN, 'PIN-access SQL copied. Run it in Supabase, SQL Editor.'));
 $('copySqlSecure').addEventListener('click', ()=>copyText(SQL_SECURE, 'Hardening SQL copied'));
 
 const SQL_SETUP = `-- Run once in Supabase → SQL Editor. Creates the media bucket for videos & photos.
@@ -1785,6 +1844,32 @@ create policy "portfolio media update" on storage.objects for update to authenti
 create policy "portfolio media delete" on storage.objects for delete to authenticated using (bucket_id = 'portfolio-media');`;
 
 
+const SQL_OPEN = `-- PIN mode: lets the site save and upload with the PIN login. Run this if you ran the hardening SQL and want the PIN to work again.
+do $$ declare r record; begin
+  for r in select policyname, tablename from pg_policies where schemaname='public' and tablename in ('projects','settings') loop
+    execute format('drop policy %I on public.%I', r.policyname, r.tablename);
+  end loop;
+end $$;
+alter table public.projects enable row level security;
+alter table public.settings enable row level security;
+create policy "public read projects"  on public.projects for select using (true);
+create policy "public read settings"  on public.settings for select using (true);
+create policy "open write projects"   on public.projects for all using (true) with check (true);
+create policy "open write settings"   on public.settings for all using (true) with check (true);
+
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('portfolio-media', 'portfolio-media', true, 52428800)
+on conflict (id) do update set public = true, file_size_limit = 52428800;
+drop policy if exists "portfolio media read"   on storage.objects;
+drop policy if exists "portfolio media insert" on storage.objects;
+drop policy if exists "portfolio media update" on storage.objects;
+drop policy if exists "portfolio media delete" on storage.objects;
+create policy "portfolio media read"   on storage.objects for select using (bucket_id = 'portfolio-media');
+create policy "portfolio media insert" on storage.objects for insert with check (bucket_id = 'portfolio-media');
+create policy "portfolio media update" on storage.objects for update using (bucket_id = 'portfolio-media');
+create policy "portfolio media delete" on storage.objects for delete using (bucket_id = 'portfolio-media');`;
+let saveWarned = 0;
+window.__saveFail = ()=>{ if(Date.now()-saveWarned < 8000) return; saveWarned = Date.now(); showToast('Supabase refused to save. Sign in with account login, or run the PIN-access SQL (Site tab).'); };
 
 /* ---------- PDF export ---------- */
 async function exportPortfolioPDF(){
@@ -1838,6 +1923,7 @@ window.addEventListener('hashchange', route);
 $('acctToggle').style.display = usingSupabase() ? '' : 'none';
 if(usingSupabase()) sb.auth.getSession().then(({data})=>{ if(data && data.session) window.__adminSession = true; }).catch(()=>{});
 pbStart();
+renderHeroText();
 init().then(()=>{ route(); onScroll(); });
 
 </script>
