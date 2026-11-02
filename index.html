@@ -659,7 +659,7 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
           <label class="dropzone" id="pbDrop">
             <input type="file" id="pbFile" accept="video/*,image/*" multiple>
             <b>Add photos and videos</b>
-            Drag and drop or click. Add as many as you like; videos up to 50 MB each.
+            Drag and drop or click. Videos up to 50 MB each. Short clips (5 to 15 seconds, 1080p or less) load fastest on the wall.
           </label>
           <div id="pbUploads"></div>
           <div class="pb-tiles" id="pbMedia"></div>
@@ -725,7 +725,9 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
           <button class="btn btn-outline btn-sm" id="copySqlSetup">Copy storage setup SQL</button>
           <button class="btn btn-outline btn-sm" id="copySqlSecure">Copy hardening SQL</button>
+          <button class="btn btn-solid btn-sm" id="checkStorage">Check storage</button>
         </div>
+        <p class="hint" id="checkStorageOut" style="max-width:640px;min-height:16px;"></p>
         <p class="hint" style="max-width:640px;">The PIN only hides this screen and is stored in a public row, so it is not real security. For real protection, create a user in Supabase under Authentication, run the hardening SQL, then sign in with account login.</p>
 
         <hr style="border:none;border-top:1px solid var(--line);margin:26px 0;">
@@ -798,7 +800,7 @@ const MEDIA_BUCKET = 'portfolio-media';
 const MAX_UPLOAD_MB = 50;
 const STARTER_DEPARTMENTS = ['Reels','Feature Projects','Music Videos'];
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const MAX_LIVE = 10;
+const MAX_LIVE = (navigator.deviceMemory && navigator.deviceMemory<=4) || /Mobi|Android/i.test(navigator.userAgent) ? 4 : 8;
 let adminUnlocked = false;
 
 /* ============ BACKEND CONFIG ============ */
@@ -1064,7 +1066,7 @@ function tileHTML(p, o){
   return `
   <article class="tile ${!o.fill && r<1?'portrait':''} ${p.hidden?'draft':''}" ${style} data-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Open ${esc(p.title)}">
     ${poster ? `<img class="poster" src="${esc(poster)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : `<div class="fallback">${esc(p.title)}</div>`}
-    ${prev ? `<video class="vid" data-src="${esc(prev)}" muted loop playsinline preload="none"></video>` : ''}
+    ${prev ? `<video class="vid" data-src="${esc(prev)}" ${poster?`poster="${esc(poster)}"`:''} muted loop playsinline preload="none" disablepictureinpicture></video>` : ''}
     <div class="scrim"></div>
     ${dur ? `<span class="tc">${esc(dur)}</span>` : ''}
     <div class="meta"><div class="t">${esc(p.title)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>
@@ -1073,12 +1075,22 @@ function tileHTML(p, o){
 }
 
 let tileIO = null;
+const stuck = new Set(); let retryArmed = false;
+/* if the browser blocks autoplay (battery saver, data saver), start the visible clips on the first touch or scroll */
+function armRetry(){
+  if(retryArmed) return; retryArmed = true;
+  const go = ()=>{ retryArmed = false; ['pointerdown','touchstart','keydown','scroll'].forEach(e=>window.removeEventListener(e,go)); const list=[...stuck]; stuck.clear(); list.forEach(t=>{ if(t.isConnected) tilePlay(t); }); };
+  ['pointerdown','touchstart','keydown','scroll'].forEach(e=>window.addEventListener(e,go,{passive:true,once:true}));
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) document.querySelectorAll('.tile.playing').forEach(tileStop); });
 function tilePlay(t){
   const v = t.querySelector('.vid'); if(!v) return;
   const live = Array.from(document.querySelectorAll('.tile.playing')).filter(c=>c!==t);
   while(live.length >= MAX_LIVE) tileStop(live.shift());
-  if(!v.getAttribute('src')) v.src = v.dataset.src;
-  const pr = v.play(); if(pr && pr.catch) pr.catch(()=>{});
+  v.muted = true; v.defaultMuted = true; v.playsInline = true;
+  if(!v.getAttribute('src')){ v.preload = 'auto'; v.src = v.dataset.src; }
+  const pr = v.play();
+  if(pr && pr.catch) pr.catch(()=>{ stuck.add(t); armRetry(); });
 }
 function tileStop(t){
   const v = t.querySelector('.vid'); if(!v) return;
@@ -1382,7 +1394,7 @@ async function sbUploadXHR(path, blob, onProg){
       let msg = 'Upload failed ('+xhr.status+')';
       try{ const j = JSON.parse(xhr.responseText); msg = j.message || j.error || msg; }catch(e){}
       if(/bucket/i.test(msg) && /not found/i.test(msg)) msg = 'The storage bucket is missing. Run the setup SQL (Site tab).';
-      if(/row-level security|policy|unauthorized/i.test(msg)) msg = 'Not allowed. Check the storage policies (Site tab) or sign in with your account.';
+      if(xhr.status===401 || xhr.status===403 || /row-level security|policy|unauthorized|not allowed/i.test(msg)) msg = 'Supabase blocked this upload. Open the Site tab and press Check storage for the fix.';
       reject(new Error(msg));
     };
     xhr.onerror = ()=>reject(new Error('Network error during upload'));
@@ -1718,6 +1730,20 @@ $('resetDataBtn').addEventListener('click', async ()=>{
   pbStart(); renderSite(); showToast('Reset to the starter portfolio');
 });
 async function copyText(t, msg){ try{ await navigator.clipboard.writeText(t); showToast(msg); }catch(e){ showToast('Copy failed. Open portfolio-setup.sql instead.'); } }
+$('checkStorage').addEventListener('click', async ()=>{
+  const out = $('checkStorageOut');
+  if(!usingSupabase()){ out.textContent = 'Supabase is not connected, so there is no storage to check.'; return; }
+  out.textContent = 'Checking…';
+  try{
+    const url = await sbUploadXHR('_check/' + Date.now() + '.txt', new Blob(['ok'],{type:'text/plain'}));
+    removeFromStorage([url]); out.textContent = 'Storage works. Uploads are allowed.';
+  }catch(e){
+    const signed = !!window.__adminSession;
+    out.innerHTML = 'Upload refused: ' + esc(e.message) + '<br>Fix: ' + (signed
+      ? 'you are signed in with an account, so run the hardening SQL (Copy hardening SQL), which allows signed-in users to upload.'
+      : 'in Supabase open SQL Editor, paste the storage setup SQL (Copy storage setup SQL above) and press Run. If you already ran the hardening SQL, sign out and use account login, because the PIN can no longer upload.');
+  }
+});
 $('copySqlSetup').addEventListener('click', ()=>copyText(SQL_SETUP, 'Setup SQL copied. Paste it in Supabase, SQL Editor.'));
 $('copySqlSecure').addEventListener('click', ()=>copyText(SQL_SECURE, 'Hardening SQL copied'));
 
