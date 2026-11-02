@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Richin Suresh, Digital Creator from Kerala. Editing, motion graphics, 3D and virtual production for films, music videos and brands."><meta property="og:title" content="Richin Suresh, Digital Creator"><meta property="og:description" content="Editing, motion graphics and 3D for films, music videos and brands."><meta name="theme-color" content="#1d1e20"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%276%27 fill=%27%231d1e20%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%23ffb21e%27/%3E%3C/svg%3E"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Richin Suresh, Digital Creator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="preconnect" href="https://ooyukxkzyscctgddqcfh.supabase.co" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -543,6 +543,70 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
 .setup-banner{border:1px solid var(--amber);background:rgba(255,178,30,.08);border-radius:6px;padding:16px 18px;margin-bottom:18px;font-size:14px;line-height:1.6;}
 .setup-banner ol{margin:10px 0 8px 20px;display:grid;gap:8px;}
 
+.tile .poster{transition:opacity .22s linear, transform .6s var(--ease);}
+.tile .cnt{position:absolute;top:10px;right:10px;z-index:4;display:flex;gap:8px;font:500 11px var(--mono);padding:4px 8px;border-radius:3px;background:rgba(20,20,22,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:var(--text);pointer-events:none;}
+.tile .cnt i{font-style:normal;color:var(--amber);margin-right:4px;}
+
+/* ---- v3: cinematic stage, list view, services, form. Deeper blacks, one amber accent. ---- */
+:root{--surround:#0c0d0f;--panel:#15161a;--lift:#212227;--line:rgba(236,235,230,.09);--line2:rgba(236,235,230,.2);}
+body::before{opacity:.55;}
+/* stage */
+.stage{position:relative;min-height:100svh;display:flex;align-items:flex-end;overflow:hidden;isolation:isolate;}
+.stage-bg{position:absolute;inset:0;z-index:-2;background:#000;}
+.stage-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;--lb:1;transform:scale(calc(var(--lb) * 1.04));animation:kb 22s ease-in-out infinite alternate;}
+@keyframes kb{to{transform:scale(calc(var(--lb) * 1.1)) translate3d(-1.5%,-1%,0);}}
+.stage-vid{position:absolute;left:50%;top:50%;border:0;opacity:0;transition:opacity 1s;pointer-events:none;transform:translate(-50%,-50%);}
+video.stage-vid{width:100%;height:100%;object-fit:cover;left:0;top:0;transform:none;}
+iframe.stage-vid{width:max(100vw,177.78svh);height:max(56.25vw,100svh);}
+.stage-vid.on{opacity:1;}
+.stage-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(12,13,15,.55) 0%,rgba(12,13,15,.05) 30%,rgba(12,13,15,.35) 62%,var(--surround) 100%),radial-gradient(90% 70% at 15% 100%,rgba(12,13,15,.8),transparent 70%);}
+.stage-in{width:100%;padding:120px var(--gutter) 64px;max-width:1700px;margin:0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:18px;}
+.stage .name{font-size:clamp(54px,12.2vw,210px) !important;line-height:.88;letter-spacing:-.02em;display:flex;flex-direction:column;}
+.stage .name span+span{margin-left:.06em;}
+.stage .hero-meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--text);font-size:15px;}
+.stage .hero-meta span+span::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--amber);margin-right:18px;vertical-align:middle;}
+.stage .tagline{max-width:34em;font-size:clamp(16px,1.6vw,21px);color:rgba(236,235,230,.85);margin:0;}
+.stage .live{display:inline-flex;align-items:center;gap:9px;font-size:13px;padding:7px 14px;border-radius:100px;background:rgba(12,13,15,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--glass-line);}
+.stage-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;}
+.stage-cta .btn{padding:15px 28px;font-size:15px;}
+.scroll-cue{position:absolute;right:var(--gutter);bottom:36px;width:26px;height:44px;border:1.5px solid rgba(236,235,230,.5);border-radius:14px;}
+.scroll-cue i{position:absolute;left:50%;top:8px;width:3px;height:8px;margin-left:-1.5px;border-radius:2px;background:var(--amber);animation:cue 1.8s ease-in-out infinite;}
+@keyframes cue{0%{opacity:0;transform:translateY(0);}30%{opacity:1;}100%{opacity:0;transform:translateY(16px);}}
+header.top:not(.scrolled){background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:transparent;}
+.ruler{margin-top:0;display:flex;align-items:center;}
+.ruler-in{flex:1;min-width:0;}
+.vt{display:flex;gap:2px;padding:3px;margin-right:var(--gutter);border:1px solid var(--line2);border-radius:100px;flex:none;}
+.vt button{padding:6px 14px;border-radius:100px;font-size:13px;color:var(--dim);transition:background .2s,color .2s;}
+.vt button.on{background:var(--text);color:#141414;}
+/* reel modal */
+.reel-modal{position:fixed;inset:0;z-index:900;background:rgba(5,5,6,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s linear .3s;}
+.reel-modal.show{opacity:1;visibility:visible;transition-delay:0s;}
+.reel-box{position:relative;width:min(94vw,calc(88vh*1.7778));aspect-ratio:16/9;background:#000;box-shadow:0 30px 90px rgba(0,0,0,.7);border-radius:4px;overflow:hidden;}
+.reel-box .reel-embed{position:absolute;inset:0;width:100%;height:100%;border:0;}
+/* list view with cursor preview */
+.grid.as-list{column-count:1;padding:10px var(--gutter) 0;}
+.row{display:grid;grid-template-columns:48px minmax(0,1fr) 190px 180px 60px;gap:18px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line);position:relative;transition:padding .35s var(--ease),color .2s;color:var(--dim);}
+.row .rt{font-size:clamp(24px,3.6vw,56px);font-weight:700;font-stretch:112%;letter-spacing:-.015em;line-height:1.05;color:var(--text);transition:transform .4s var(--ease),color .2s;}
+.row .rn,.row .ry{font-size:12px;color:var(--faint);} .row .rc,.row .rm{font-size:14px;}
+.row:hover{padding-left:18px;} .row:hover .rt{color:var(--amber);}
+.rthumb{display:none;}
+.floater{position:fixed;left:0;top:0;z-index:700;width:min(380px,32vw);aspect-ratio:var(--fr,1.7778);pointer-events:none;border-radius:6px;overflow:hidden;background:var(--panel);box-shadow:0 30px 70px -20px rgba(0,0,0,.8);opacity:0;scale:.92;transition:opacity .2s,scale .3s var(--ease);will-change:transform;}
+.floater.show{opacity:1;scale:1;}
+.floater img,.floater video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+@media (hover:none){.floater{display:none;} .row{grid-template-columns:72px minmax(0,1fr);grid-template-areas:'th t' 'th c';gap:2px 14px;padding:14px 0;} .rthumb{display:block;grid-area:th;width:72px;height:72px;object-fit:cover;border-radius:4px;} .rn,.rm,.ry{display:none;} .row .rt{grid-area:t;font-size:20px;} .row .rc{grid-area:c;}}
+/* services, kind words, form */
+.svc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:22px;}
+.svc-i{background:var(--surround);padding:28px 24px;transition:background .3s;} .svc-i:hover{background:var(--panel);}
+.svc-i h3{font-size:20px;font-weight:700;font-stretch:108%;margin-bottom:8px;} .svc-i p{color:var(--dim);font-size:14.5px;line-height:1.6;}
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:22px;}
+.quote{padding:26px;border:1px solid var(--line);border-radius:6px;background:var(--panel);}
+.quote blockquote{font-size:18px;line-height:1.55;} .quote figcaption{margin-top:16px;color:var(--dim);font-size:13px;}
+.cform{display:grid;gap:12px;max-width:640px;margin:28px 0 34px;}
+.cform input,.cform textarea{width:100%;background:var(--panel);border:1px solid var(--line2);color:var(--text);padding:14px 16px;border-radius:4px;font:inherit;font-size:15px;}
+.cform textarea{min-height:130px;resize:vertical;} .cform input:focus,.cform textarea:focus{outline:none;border-color:var(--amber);}
+@media (max-width:860px){.stage-in{padding:100px 16px 48px;} .scroll-cue{display:none;} .vt{margin-right:12px;} .row{grid-template-columns:72px minmax(0,1fr);}}
+@media (prefers-reduced-motion:reduce){.stage-poster{animation:none;}}
+
 </style>
 </head>
 <body>
@@ -557,23 +621,38 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
   <button class="burger" id="burger" aria-label="Menu"><span></span></button>
 </header>
 
-<section class="hero" id="hero">
-  <div class="hero-id">
+<section class="stage" id="hero">
+  <div class="stage-bg" id="stageBg"></div>
+  <div class="stage-shade"></div>
+  <div class="stage-in">
+    <span class="live" id="availBadge"><b></b><span id="heroAvail"></span></span>
     <h1 class="name"><span id="heroLine1">RICHIN</span><span id="heroLine2">SURESH</span></h1>
-    <div class="hero-meta">
-      <span id="heroRoleVal">Digital Creator</span>
-      <span id="heroBaseVal">Kerala, India</span>
-      <span class="live" id="availBadge"><b></b><span id="heroAvail"></span></span>
+    <div class="hero-meta"><span id="heroRoleVal">Digital Creator</span><span id="heroBaseVal">Kerala, India</span></div>
+    <p class="tagline" id="heroTagline"></p>
+    <div class="stage-cta">
+      <button class="btn btn-solid" id="reelPlayBtn">Watch the showreel</button>
+      <a class="btn btn-outline" href="#work">See the work</a>
     </div>
   </div>
-  <p class="tagline" id="heroTagline"></p>
+  <a class="scroll-cue" href="#work" aria-label="Scroll to work"><i></i></a>
 </section>
 
 <nav class="ruler" id="ruler" aria-label="Departments">
   <div class="ruler-in" id="rulerLinks"></div>
+  <div class="vt" id="viewToggle" role="group" aria-label="View"></div>
 </nav>
 
 <main id="work"><div class="grid" id="grid"></div></main>
+
+<section class="block" id="services" style="display:none;">
+  <div class="eyebrow">What I do</div>
+  <div class="svc" id="svcGrid"></div>
+</section>
+
+<section class="block" id="proof" style="display:none;">
+  <div class="eyebrow">Kind words</div>
+  <div class="quotes" id="quoteGrid"></div>
+</section>
 
 <section class="block" id="about">
   <div class="about-grid">
@@ -588,10 +667,18 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
 
 <section class="block" id="contact">
   <h2 class="contact-big">Have a project?<br>Send the brief.</h2>
+  <form class="cform" id="contactForm" autocomplete="off">
+    <input id="cfName" type="text" placeholder="Your name" maxlength="80">
+    <textarea id="cfMsg" placeholder="Tell me about the project: what it is, the length, the deadline."></textarea>
+    <div class="hero-cta">
+      <button type="submit" class="btn btn-solid" id="cfEmail">Send by email</button>
+      <button type="button" class="btn btn-outline" id="cfWa">Send on WhatsApp</button>
+    </div>
+  </form>
   <div class="contact-row">
     <div class="hero-cta">
-      <a class="btn btn-solid" id="emailLink" href="#" style="display:none;">Email me</a>
-      <a class="btn btn-outline" id="whatsappLink" href="https://wa.me/" target="_blank" rel="noopener">Message on WhatsApp</a>
+      <a class="btn btn-outline" id="emailLink" href="#" style="display:none;">Email me</a>
+      <a class="btn btn-outline" id="whatsappLink" href="https://wa.me/" target="_blank" rel="noopener">WhatsApp</a>
     </div>
     <div class="socials">
       <a href="https://www.instagram.com/richinsuresh/" target="_blank" rel="noopener">Instagram</a>
@@ -605,6 +692,9 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
   <span id="footName">© 2026 Richin Suresh</span>
   <button class="admin-gear" id="adminOpenBtn" title="Admin" aria-label="Admin">⚙</button>
 </footer>
+
+<div class="reel-modal" id="reelModal" role="dialog" aria-label="Showreel"><button class="lb-btn lb-close" id="reelClose" aria-label="Close">✕</button><div class="reel-box" id="reelBox"></div></div>
+<div class="floater" id="floater" aria-hidden="true"><img alt=""><video muted loop playsinline></video></div>
 
 <!-- WORK DETAIL PAGE -->
 <div class="work-page" id="workPage" aria-live="polite"></div>
@@ -703,6 +793,12 @@ header.top{background:var(--glass);-webkit-backdrop-filter:blur(18px) saturate(1
           <div class="form-field full"><label>One-line pitch under your name</label><textarea id="sHeroTagline" style="min-height:64px"></textarea></div>
           <div class="form-field full"><label>About you</label><textarea id="sAbout"></textarea></div>
           <div class="form-field full"><label>Stats, one per line as “value | label”</label><textarea id="sStats" placeholder="2M+ | Views on Por Mugham"></textarea></div>
+        </div>
+
+        <p class="eyebrow" style="margin:28px 0 14px;">Services and kind words</p>
+        <div class="form-grid">
+          <div class="form-field full"><label>Services, one per line as “title | short description” (empty hides the section)</label><textarea id="sServices"></textarea></div>
+          <div class="form-field full"><label>Kind words, one per line as “quote | name, role” (empty hides the section)</label><textarea id="sQuotes"></textarea></div>
         </div>
 
         <p class="eyebrow" style="margin:28px 0 14px;">Showreel</p>
@@ -949,7 +1045,9 @@ function defaultSettings(){
     heroTagline:"I edit, grade and build motion and 3D for short films, music videos and brands.",
     aboutText:"I'm Richin, a Digital Creator from Kerala, India. I make visually appealing content that brings serenity and joy, and I keep learning whatever a project needs.",
     introStats:"2M+ | Views on Por Mugham\n100K+ | Views on Lady\n11 | Software tools\n5 | Roles covered",
-    availability:"Open for freelance work", email:"", categoryOrder:[]
+    availability:"Open for freelance work", email:"", categoryOrder:[],
+    services:"Editing | Short films, music videos, ads and reels, cut for story and pace.\nColour grading | A consistent look across a whole film, from rough cut to delivery.\nMotion graphics | Titles, lyric videos and animated graphics for edits and social.\n3D and virtual production | Environments, props and Unreal Engine scenes for film and music.",
+    quotes:""
   };
 }
 
@@ -1111,15 +1209,20 @@ async function savePost(p){ if(usingSupabase()) await sbUpsertProject(p); else a
    ===================================================================== */
 function tileHTML(p, o){
   o = o||{};
-  const r = nwRatio(p), poster = nwPoster(p), prev = o.noPreview ? '' : nwPreviewSrc(p), dur = nwDuration(p);
+  const r = nwRatio(p), poster = nwPoster(p), dur = nwDuration(p), ms = p.media||[];
+  const vsrcs = o.noPreview ? [] : ms.filter(m=>m.type==='video' && (parseVideo(m.src)||{}).kind==='file').map(m=>m.src).slice(0,6), prev = vsrcs[0] || '';
+  const imgs = [...new Set(ms.filter(m=>m.type==='image').map(m=>m.src))].slice(0,6);
+  const nv = ms.filter(m=>m.type==='video').length, ni = ms.filter(m=>m.type==='image').length;
+  const slides = (!prev && !o.noPreview && imgs.length>1) ? imgs : [];
   const sub = o.sub!=null ? o.sub : (p.year || (p.date ? new Date(p.date).getFullYear() : ''));
   const style = o.fill ? `style="--i:${o.i||0}"` : `style="--r:${r.toFixed(4)}"`;
   return `
-  <article class="tile ${!o.fill && r<1?'portrait':''} ${p.hidden?'draft':''}" ${style} data-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Open ${esc(p.title)}">
+  <article class="tile ${!o.fill && r<1?'portrait':''} ${p.hidden?'draft':''}" ${style} ${vsrcs.length>1?`data-srcs='${esc(JSON.stringify(vsrcs))}'`:''} ${slides.length?`data-imgs='${esc(JSON.stringify(slides))}'`:''} data-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Open ${esc(p.title)}">
     ${poster ? `<img class="poster" src="${esc(poster)}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">` : `<div class="fallback">${esc(p.title)}</div>`}
-    ${prev ? `<video class="vid" data-src="${esc(prev)}" ${poster?`poster="${esc(poster)}"`:''} muted loop playsinline preload="none" disablepictureinpicture></video>` : ''}
+    ${prev ? `<video class="vid" data-src="${esc(prev)}" ${poster?`poster="${esc(poster)}"`:''} muted ${vsrcs.length>1?'':'loop'} playsinline preload="none" disablepictureinpicture></video>` : ''}
     <div class="scrim"></div>
     ${dur ? `<span class="tc">${esc(dur)}</span>` : ''}
+    ${(nv+ni)>1 ? `<span class="cnt" aria-label="${nv} videos, ${ni} photos">${nv?`<i>▶</i>${nv}`:''}${ni?`<i>▣</i>${ni}`:''}</span>` : ''}
     <div class="meta"><div class="t">${esc(p.title)}</div>${sub?`<div class="sub">${esc(sub)}</div>`:''}</div>
     ${prev ? `<button class="badge snd" data-snd aria-label="Sound on or off" title="Sound on or off">🔇</button>` : (hasVideo(p) ? `<span class="badge play" aria-hidden="true"></span>` : '')}
   </article>`;
@@ -1134,8 +1237,15 @@ function armRetry(){
   ['pointerdown','touchstart','keydown','scroll'].forEach(e=>window.addEventListener(e,go,{passive:true,once:true}));
 }
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) document.querySelectorAll('.tile.playing').forEach(tileStop); });
+function slideStart(t){
+  if(t._sl || !t.dataset.imgs) return;
+  const list = JSON.parse(t.dataset.imgs), el = t.querySelector('.poster'); if(!el) return; let i = 0;
+  list.slice(1).forEach(u=>{ const im = new Image(); im.src = u; });
+  t._sl = setInterval(()=>{ i = (i+1)%list.length; el.style.opacity = 0; setTimeout(()=>{ el.src = list[i]; el.style.opacity = 1; }, 220); }, 2400);
+}
+function slideStop(t){ if(!t._sl) return; clearInterval(t._sl); t._sl = 0; const el = t.querySelector('.poster'); if(el && t.dataset.imgs){ el.src = JSON.parse(t.dataset.imgs)[0]; el.style.opacity = 1; } }
 function tilePlay(t){
-  const v = t.querySelector('.vid'); if(!v) return;
+  const v = t.querySelector('.vid'); if(!v){ slideStart(t); return; }
   const live = Array.from(document.querySelectorAll('.tile.playing')).filter(c=>c!==t);
   while(live.length >= MAX_LIVE) tileStop(live.shift());
   v.muted = true; v.defaultMuted = true; v.playsInline = true;
@@ -1144,7 +1254,8 @@ function tilePlay(t){
   if(pr && pr.catch) pr.catch(()=>{ stuck.add(t); armRetry(); });
 }
 function tileStop(t){
-  const v = t.querySelector('.vid'); if(!v) return;
+  const v = t.querySelector('.vid'); if(!v){ slideStop(t); return; }
+  if(t.dataset.srcs && v.dataset.src && v.getAttribute('src')!==v.dataset.src){ v.src = v.dataset.src; v._i = 0; }
   v.pause(); t.classList.remove('playing'); try{ v.currentTime = 0; }catch(e){}
 }
 function bindTiles(root, onOpen){
@@ -1152,14 +1263,18 @@ function bindTiles(root, onOpen){
     const id = t.dataset.id, v = t.querySelector('.vid');
     t.addEventListener('click', e=>{ if(e.target.closest('[data-snd]')) return; onOpen(id); });
     t.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); onOpen(id); } });
-    if(!v) return;
-    v.addEventListener('playing', ()=>t.classList.add('playing'));
+    if(!v && !t.dataset.imgs) return;
+    if(v){
+      v.addEventListener('playing', ()=>t.classList.add('playing'));
+      if(t.dataset.srcs){ const list = JSON.parse(t.dataset.srcs); v._i = 0;
+        v.addEventListener('ended', ()=>{ v._i = (v._i+1)%list.length; v.src = list[v._i]; const pr = v.play(); if(pr && pr.catch) pr.catch(()=>{}); }); }
+    }
     if(REDUCED){
       t.addEventListener('mouseenter', ()=>tilePlay(t)); t.addEventListener('mouseleave', ()=>tileStop(t));
       t.addEventListener('focus', ()=>tilePlay(t)); t.addEventListener('blur', ()=>tileStop(t));
     } else if(tileIO) tileIO.observe(t);
     const snd = t.querySelector('[data-snd]');
-    if(snd) snd.addEventListener('click', e=>{
+    if(snd && v) snd.addEventListener('click', e=>{
       e.stopPropagation(); v.muted = !v.muted; snd.textContent = v.muted ? '🔇' : '🔊';
       if(!v.muted && v.paused) tilePlay(t);
     });
@@ -1167,26 +1282,49 @@ function bindTiles(root, onOpen){
 }
 function openFromTile(id){ workViaApp = true; workScrollY = window.scrollY; location.hash = '#/work/'+encodeURIComponent(id); }
 
-function reelTile(){
-  return `<div class="tile reel" id="reelFrame" style="--r:1.7778" tabindex="0">
-    <img class="poster" src="${esc(SETTINGS.reelPoster || IMG.hero_kheefa)}" alt="">
-    ${reelIsFile() ? `<video class="vid on" src="${esc(SETTINGS.reelUrl)}" muted loop autoplay playsinline></video>` : ''}
-    <div class="scrim"></div>
-    <button class="reel-play" id="reelPlayBtn" aria-label="Play showreel"><span class="pbtn"></span><span class="rl">Showreel</span></button>
-  </div>`;
-}
 function mountReel(frame){
   const url = SETTINGS.reelUrl || '', v = parseVideo(url);
-  if(!v){ showToast('No showreel set yet. Add one in Admin, Site.'); return; }
+  if(!v){ showToast('No showreel set yet. Add one in Admin, Site.'); return false; }
   let el;
   if(v.kind==='file'){ el = document.createElement('video'); el.src = url; el.controls = true; el.autoplay = true; el.playsInline = true; el.className = 'reel-embed'; el.style.objectFit = 'contain'; }
   else { el = document.createElement('iframe'); el.className = 'reel-embed'; el.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; el.allowFullscreen = true;
     el.src = v.kind==='youtube' ? `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0` : (v.kind==='vimeo' ? `https://player.vimeo.com/video/${v.id}?autoplay=1` : url); }
-  frame.querySelectorAll('.vid').forEach(x=>x.pause());
-  frame.appendChild(el);
+  frame.appendChild(el); return true;
+}
+function openReel(){ const box = $('reelBox'); box.innerHTML = ''; if(mountReel(box)) $('reelModal').classList.add('show'); }
+function closeReel(){ $('reelModal').classList.remove('show'); setTimeout(()=>{ if(!$('reelModal').classList.contains('show')) $('reelBox').innerHTML=''; }, 300); }
+$('reelPlayBtn').addEventListener('click', openReel);
+$('reelClose').addEventListener('click', closeReel);
+$('reelModal').addEventListener('click', e=>{ if(e.target.id==='reelModal') closeReel(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && $('reelModal').classList.contains('show')) closeReel(); });
+
+/* hero: the showreel plays silently behind your name */
+let stageKey = '';
+function renderStage(){
+  const url = SETTINGS.reelUrl || '', v = parseVideo(url), poster = SETTINGS.reelPoster || (typeof IMG!=='undefined' ? IMG.hero_kheefa : '');
+  const key = url+'|'+poster; if(key===stageKey) return; stageKey = key;
+  const bg = $('stageBg');
+  bg.innerHTML = poster ? `<img class="stage-poster" src="${esc(poster)}" alt="">` : '';
+  /* some posters carry black letterbox bars baked in; measure them and crop so the hero fills the screen */
+  if(poster){ const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = ()=>{ try{
+    const c = document.createElement('canvas'); c.width = 32; c.height = 48; const x = c.getContext('2d'); x.drawImage(im,0,0,32,48);
+    let rows = 0; for(let y=0;y<24;y++){ const d = x.getImageData(0,y,32,1).data; let l = 0; for(let i=0;i<d.length;i+=4) l += d[i]+d[i+1]+d[i+2]; if(l/(d.length/4*3) < 14) rows++; else break; }
+    if(rows>=2){ const f = rows/48, sc = Math.min(1.8, 1.08/(1-2*f)); const el = bg.querySelector('.stage-poster'); if(el) el.style.setProperty('--lb', sc.toFixed(3)); }
+  }catch(e){} }; im.src = poster; }
+  $('reelPlayBtn').style.display = v ? '' : 'none';
+  if(REDUCED || !v) return;
+  const mount = ()=>{
+    let el;
+    if(v.kind==='file'){ el = document.createElement('video'); el.src = url; el.muted = true; el.defaultMuted = true; el.loop = true; el.autoplay = true; el.playsInline = true; el.setAttribute('playsinline',''); el.preload = 'auto'; el.addEventListener('playing', ()=>el.classList.add('on')); const pr = el.play(); if(pr && pr.catch) pr.catch(()=>{}); }
+    else if(v.kind==='youtube'){ el = document.createElement('iframe'); el.src = `https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${v.id}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1`; el.allow = 'autoplay; encrypted-media'; el.tabIndex = -1; el.setAttribute('aria-hidden','true'); el.addEventListener('load', ()=>setTimeout(()=>el.classList.add('on'), 1200)); }
+    else if(v.kind==='vimeo'){ el = document.createElement('iframe'); el.src = `https://player.vimeo.com/video/${v.id}?background=1&autoplay=1&muted=1&loop=1`; el.allow = 'autoplay'; el.tabIndex = -1; el.setAttribute('aria-hidden','true'); el.addEventListener('load', ()=>setTimeout(()=>el.classList.add('on'), 800)); }
+    if(el){ el.className = (el.className||'') + ' stage-vid'; bg.appendChild(el); }
+  };
+  (window.requestIdleCallback || (f=>setTimeout(f,250)))(mount);
 }
 
-let CUR = 'all';
+let CUR = 'all', VIEW = 'wall';
+try{ if(localStorage.getItem('pf:view')==='list') VIEW = 'list'; }catch(e){}
 function renderFilters(){
   const cats = categories(), total = livePosts().length;
   $('ruler').style.display = cats.length ? '' : 'none';
@@ -1194,19 +1332,46 @@ function renderFilters(){
   $('rulerLinks').innerHTML = [`<button data-slug="all" class="${CUR==='all'?'on':''}">All<sup>${total}</sup></button>`]
     .concat(cats.map(c=>`<button data-slug="${c.slug}" class="${CUR===c.slug?'on':''}">${esc(c.name)}<sup>${c.posts.length}</sup></button>`)).join('');
   $('rulerLinks').querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{ CUR = b.dataset.slug; renderFilters(); renderGrid(); }));
+  $('viewToggle').innerHTML = ['wall','list'].map(v=>`<button data-view="${v}" class="${VIEW===v?'on':''}" aria-pressed="${VIEW===v}">${v==='wall'?'Wall':'List'}</button>`).join('');
+  $('viewToggle').querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{ VIEW = b.dataset.view; try{ localStorage.setItem('pf:view', VIEW); }catch(e){} renderFilters(); renderGrid(); }));
+}
+function countLabel(p){
+  const ms = p.media||[], nv = ms.filter(m=>m.type==='video').length, ni = ms.filter(m=>m.type==='image').length;
+  return [nv?nv+(nv>1?' videos':' video'):'', ni?ni+(ni>1?' photos':' photo'):''].filter(Boolean).join(', ');
+}
+function renderList(g, posts){
+  g.innerHTML = posts.map((p,i)=>`<a class="row" href="#/work/${encodeURIComponent(p.id)}" data-id="${esc(p.id)}">
+    <span class="rn mono">${String(i+1).padStart(2,'0')}</span><span class="rt">${esc(p.title)}</span><span class="rc">${esc(p.category||'')}</span>
+    <span class="rm">${esc(countLabel(p))}</span><span class="ry mono">${esc(p.year||'')}</span>
+    ${nwPoster(p)?`<img class="rthumb" src="${esc(nwPoster(p))}" alt="" loading="lazy" decoding="async">`:''}</a>`).join('');
+  const fl = $('floater'), fi = fl.querySelector('img'), fv = fl.querySelector('video'); let raf = 0, mx = 0, my = 0;
+  const place = ()=>{ raf = 0; fl.style.transform = `translate3d(${mx+28}px,${my-fl.offsetHeight/2}px,0)`; };
+  g.querySelectorAll('.row').forEach(r=>{
+    const p = PROJECTS.find(x=>x.id===r.dataset.id);
+    r.addEventListener('click', e=>{ e.preventDefault(); fl.classList.remove('show'); openFromTile(r.dataset.id); });
+    r.addEventListener('mouseenter', e=>{
+      if(!p) return; const ps = nwPoster(p), pv = nwPreviewSrc(p), rr = nwRatio(p);
+      fl.style.setProperty('--fr', rr.toFixed(3)); fi.src = ps || ''; fi.style.display = ps ? '' : 'none';
+      if(pv && !REDUCED){ fv.src = pv; fv.currentTime = 0; const pr = fv.play(); if(pr && pr.catch) pr.catch(()=>{}); fv.style.display=''; } else { fv.pause(); fv.removeAttribute('src'); fv.style.display='none'; }
+      mx = e.clientX; my = e.clientY; place(); fl.classList.add('show');
+    });
+    r.addEventListener('mousemove', e=>{ mx = e.clientX; my = e.clientY; if(!raf) raf = requestAnimationFrame(place); });
+    r.addEventListener('mouseleave', ()=>{ fl.classList.remove('show'); fv.pause(); });
+  });
 }
 function renderGrid(){
   const g = $('grid'), cats = categories();
   const posts = CUR==='all' ? livePosts() : (cats.find(c=>c.slug===CUR)||{posts:[]}).posts;
   if(tileIO) tileIO.disconnect();
-  if(!posts.length && !SETTINGS.reelUrl){
+  g.className = 'grid' + (VIEW==='list' ? ' as-list' : '');
+  if(!posts.length){
     g.innerHTML = `<div class="empty">Nothing is published yet. Sign in from the gear in the footer and post your first video.</div>`; return;
   }
-  g.innerHTML = (CUR==='all' && SETTINGS.reelUrl ? reelTile() : '') + posts.map(p=>tileHTML(p,{sub:CUR==='all'?p.category:(p.year||'')})).join('');
-  bindTiles(g, openFromTile); bindReel();
+  if(VIEW==='list'){ renderList(g, posts); return; }
+  g.innerHTML = posts.map(p=>tileHTML(p,{sub:CUR==='all'?p.category:(p.year||'')})).join('');
+  bindTiles(g, openFromTile);
 }
 function reelIsFile(){ const v = parseVideo(SETTINGS.reelUrl); return !!v && v.kind==='file'; }
-function bindReel(){ const b = $('reelPlayBtn'); if(b) b.addEventListener('click', ()=>mountReel($('reelFrame'))); }
 function renderHeroText(){
   const l1 = SETTINGS.heroLine1||'RICHIN', l2 = SETTINGS.heroLine2||'SURESH';
   $('logoText').textContent = SETTINGS.logoText || 'RS';
@@ -1220,6 +1385,11 @@ function renderHeroText(){
   const lines = String(SETTINGS.introStats||'').split('\n').map(s=>s.trim()).filter(Boolean);
   $('introStats').innerHTML = lines.map(l=>{ const i=l.indexOf('|'); return `<div class="stat"><b>${esc((i<0?l:l.slice(0,i)).trim())}</b><span>${esc((i<0?'':l.slice(i+1)).trim())}</span></div>`; }).join('');
   $('softwareGrid').innerHTML = SOFTWARE.map(s=>`<span>${esc(s)}</span>`).join('');
+  const pairs = txt=>String(txt||'').split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{ const i=l.indexOf('|'); return i<0 ? [l,''] : [l.slice(0,i).trim(), l.slice(i+1).trim()]; });
+  const sv = pairs(SETTINGS.services); $('services').style.display = sv.length ? '' : 'none';
+  $('svcGrid').innerHTML = sv.map(([t,d])=>`<div class="svc-i"><h3>${esc(t)}</h3>${d?`<p>${esc(d)}</p>`:''}</div>`).join('');
+  const qs = pairs(SETTINGS.quotes); $('proof').style.display = qs.length ? '' : 'none';
+  $('quoteGrid').innerHTML = qs.map(([q,n])=>`<figure class="quote"><blockquote>${esc(q)}</blockquote>${n?`<figcaption>${esc(n)}</figcaption>`:''}</figure>`).join('');
   const em = $('emailLink'), hire = $('hireBtn');
   if(SETTINGS.email){ em.href = 'mailto:'+SETTINGS.email; em.style.display = ''; hire.href = 'mailto:'+SETTINGS.email; } else { em.style.display = 'none'; hire.href = '#contact'; }
   const wa = $('whatsappLink'); wa.href = SETTINGS.whatsapp || 'https://wa.me/'; wa.style.display = (SETTINGS.whatsapp && SETTINGS.whatsapp!=='https://wa.me/') ? '' : 'none';
@@ -1229,7 +1399,7 @@ function renderSite(){
   if(!REDUCED && 'IntersectionObserver' in window){
     tileIO = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) tilePlay(e.target); else tileStop(e.target); }), {threshold:[0,.2],rootMargin:'80px 0px'});
   }
-  renderHeroText(); renderFilters(); renderGrid(); saveCache();
+  renderHeroText(); renderStage(); renderFilters(); renderGrid(); saveCache();
   if($('adminPanelBackdrop').classList.contains('show')) adminRefresh();
   onScroll();
 }
@@ -1259,7 +1429,7 @@ function ensureInstagramEmbedScript(cb){
   if(existing){ existing.addEventListener('load', cb); return; }
   const s = document.createElement('script'); s.id='igEmbedScript'; s.async = true; s.src = 'https://www.instagram.com/embed.js'; s.onload = cb; document.body.appendChild(s);
 }
-function mountPlayer(box, m, autoplay){
+function mountPlayer(box, m, autoplay, quiet){
   const v = parseVideo(m.src) || {};
   if(v.kind==='youtube') box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${esc(v.id)}?autoplay=${autoplay?1:0}&rel=0&modestbranding=1&playsinline=1" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="${esc(m.caption||'Video')}"></iframe>`;
   else if(v.kind==='vimeo') box.innerHTML = `<iframe src="https://player.vimeo.com/video/${esc(v.id)}?autoplay=${autoplay?1:0}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="${esc(m.caption||'Video')}"></iframe>`;
@@ -1267,7 +1437,7 @@ function mountPlayer(box, m, autoplay){
     box.classList.add('ig');
     box.innerHTML = `<blockquote class="instagram-media" data-instgrm-permalink="${esc(m.src)}" data-instgrm-version="14"></blockquote>`;
     ensureInstagramEmbedScript(()=>{ if(window.instgrm && window.instgrm.Embeds) window.instgrm.Embeds.process(); });
-  } else box.innerHTML = `<video src="${esc(m.src)}" controls playsinline ${autoplay?'autoplay':''} ${m.poster?`poster="${esc(m.poster)}"`:''}></video>`;
+  } else box.innerHTML = `<video src="${esc(m.src)}" controls playsinline ${autoplay?'autoplay':''} ${quiet?'muted loop':''} ${m.poster?`poster="${esc(m.poster)}"`:''}></video>`;
 }
 function facadeHTML(m, label){
   const p = posterOf(m);
@@ -1339,6 +1509,7 @@ function renderWorkPage(p, mid){
   $('wpShare').addEventListener('click', ()=>shareWork(p));
   if(prev) $('wpPrev').addEventListener('click', ()=>goWork(prev.id));
   if(next) $('wpNext').addEventListener('click', ()=>goWork(next.id));
+  if(stage && stage.type==='video' && (parseVideo(stage.src)||{}).kind==='file' && $('wpStagePlayer')) mountPlayer($('wpStagePlayer'), stage, true, true);
   page.querySelectorAll('[data-play]').forEach(f=>{
     const act = ()=>{ const item = f.closest('[data-vi]'); mountPlayer(f.parentElement, item ? media[+item.dataset.vi] : stage, true); };
     f.addEventListener('click', act); f.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); act(); } });
@@ -1760,7 +1931,7 @@ dz.addEventListener('drop', e=>{ if(e.dataTransfer && e.dataTransfer.files.lengt
    ===================================================================== */
 function fillSiteForm(){
   const map = {sLogoText:'logoText', sHeroRole:'heroRole', sHeroLine1:'heroLine1', sHeroLine2:'heroLine2', sHeroBase:'heroBase', sAvail:'availability',
-    sHeroTagline:'heroTagline', sAbout:'aboutText', sStats:'introStats', sReelUrl:'reelUrl', sWhatsapp:'whatsapp', sEmail:'email'};
+    sHeroTagline:'heroTagline', sAbout:'aboutText', sStats:'introStats', sServices:'services', sQuotes:'quotes', sReelUrl:'reelUrl', sWhatsapp:'whatsapp', sEmail:'email'};
   Object.keys(map).forEach(id=>{ if(document.activeElement !== $(id)) $(id).value = SETTINGS[map[id]] || ''; });
   $('exportFileName').value = (SETTINGS.heroLine1||'Richin')+'-'+(SETTINGS.heroLine2||'Suresh')+'-Portfolio.pdf';
   const pv = $('reelPosterPreview'); pv.src = SETTINGS.reelPoster || ''; pv.style.display = SETTINGS.reelPoster ? 'block' : 'none';
@@ -1801,7 +1972,7 @@ $('sReelVideoInput').addEventListener('change', async e=>{
 $('saveSettingsBtn').addEventListener('click', async ()=>{
   const g = id=>$(id).value.trim();
   Object.assign(SETTINGS, {logoText:g('sLogoText')||SETTINGS.logoText, heroRole:g('sHeroRole'), heroLine1:g('sHeroLine1')||SETTINGS.heroLine1, heroLine2:g('sHeroLine2')||SETTINGS.heroLine2,
-    heroBase:g('sHeroBase'), availability:g('sAvail'), heroTagline:g('sHeroTagline'), aboutText:g('sAbout'), introStats:g('sStats'),
+    heroBase:g('sHeroBase'), availability:g('sAvail'), heroTagline:g('sHeroTagline'), aboutText:g('sAbout'), introStats:g('sStats'), services:g('sServices'), quotes:g('sQuotes'),
     reelUrl:g('sReelUrl'), whatsapp:g('sWhatsapp')||'https://wa.me/', email:g('sEmail')});
   const pin = g('sPin'); if(pin){ SETTINGS.pin = pin; $('sPin').value = ''; }
   await persistSettings(); renderSite(); showToast('Site settings saved');
@@ -1954,6 +2125,12 @@ $('exportPdfBtn').addEventListener('click', exportPortfolioPDF);
 /* =====================================================================
    BOOT
    ===================================================================== */
+function briefText(){ const n = $('cfName').value.trim(), m = $('cfMsg').value.trim(); return (n ? 'Hi, I am '+n+'. ' : 'Hi. ') + (m || 'I would like to talk about a project.'); }
+$('contactForm').addEventListener('submit', e=>{ e.preventDefault();
+  if(!SETTINGS.email){ showToast('Email is not set up yet. Use WhatsApp instead.'); return; }
+  location.href = 'mailto:'+SETTINGS.email+'?subject='+encodeURIComponent('Project enquiry')+'&body='+encodeURIComponent(briefText()); });
+$('cfWa').addEventListener('click', ()=>{ const wa = SETTINGS.whatsapp; if(!wa || wa==='https://wa.me/'){ showToast('WhatsApp is not set up yet. Use email instead.'); return; }
+  window.open(wa + (wa.includes('?')?'&':'?') + 'text=' + encodeURIComponent(briefText()), '_blank', 'noopener'); });
 window.addEventListener('hashchange', route);
 $('acctToggle').style.display = usingSupabase() ? '' : 'none';
 if(usingSupabase()) sb.auth.getSession().then(({data})=>{ if(data && data.session) window.__adminSession = true; }).catch(()=>{});
